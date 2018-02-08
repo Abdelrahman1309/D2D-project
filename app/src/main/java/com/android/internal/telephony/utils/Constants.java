@@ -129,14 +129,6 @@ public final class Constants {
     public static void setPhoneNumber(String mPhoneNumber) {
         Constants.mPhoneNumber = mPhoneNumber;
     }
-/*
-    public static String getOtherPhoneNumber() {
-        return mOtherPhoneNumber;
-    }
-
-    public static void setOtherPhoneNumber(String mOtherPhoneNumber) {
-        Constants.mOtherPhoneNumber = mOtherPhoneNumber;
-    }*/
 
 
 

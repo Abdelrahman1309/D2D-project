@@ -57,7 +57,11 @@ public class CallActivity extends FragmentActivity {
                 i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
                 i.putExtra(Constants.Calling.MAKE_CALL_ACTION_PARAM, mDeviceIP);
                 sendBroadcast(i);
-                pushCallProcessFragment(mDevicePhoneNumber);
+                try {
+                    pushCallProcessFragment(mDevicePhoneNumber);
+                }catch (IllegalStateException ex){
+
+                }
             }else if(intent.getAction().equals("CALL_ENDED")) {
                 CallActivity.this.finish();
             }

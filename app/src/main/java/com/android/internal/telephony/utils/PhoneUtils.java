@@ -49,10 +49,7 @@ public class PhoneUtils {
                 return phoneNum;
             }
         }catch (Exception ex){
-
-
             Log.i("Get phone number","Failed");
-
         }
         return null;
     }

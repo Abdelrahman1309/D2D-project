@@ -34,9 +34,9 @@ public class CallService extends Service {
     private Observable<Void> mCallInstance;
     private boolean mRunCallingServer = false;
     private boolean mRunCallingInstance = false;
-    private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    int minBufSize = AudioRecord.getMinBufferSize(Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat);
+    private static int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+    private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    static int minBufSize = AudioRecord.getMinBufferSize(Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat);
 
     private static String mTag;
     private CompositeDisposable mDisposable = new CompositeDisposable();
@@ -93,7 +93,10 @@ public class CallService extends Service {
                 atrack.release();
                 observer.onComplete();
                 serverSocket.disconnect();
-            }catch (Exception ex){observer.onError(ex);}
+            }catch (Exception ex){
+                observer.onError(ex);
+                Log.w("Call server","Failed to start");
+            }
         });
     }
     private void startCallServer(){

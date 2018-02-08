@@ -26,7 +26,7 @@ public class CellularCallReceiver extends BroadcastReceiver {
         String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
 
-        if(stateStr != null) {
+        if(stateStr != null && number != null) {
             if (stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                 Log.i(Constants.TAG, "Phone is Idle");
             } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {

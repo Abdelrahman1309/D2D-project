@@ -149,7 +149,7 @@ private void checkNumber(){
     prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
     devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
     if ( !mPhone.getText().toString().isEmpty() && !mPhone.getText().toString().equals(devicePhoneNumber)) makeCall();
-    else {Toast toast = Toast.makeText(getApplicationContext(),"Invaled number", Toast.LENGTH_SHORT);
+    else {Toast toast = Toast.makeText(getApplicationContext(),"Invalid number", Toast.LENGTH_SHORT);
         toast.show();}
 }
 }

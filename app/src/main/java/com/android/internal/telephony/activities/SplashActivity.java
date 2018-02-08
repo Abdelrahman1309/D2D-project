@@ -65,8 +65,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         setContentView(R.layout.activity_splash);
 
         requestBasicPermissions();
-
-
+        requestRecordAudioPermission();
 
         String phoneNumber = PhoneUtils.getPhoneNumber(this);
         if(phoneNumber!= null) {
@@ -76,6 +75,8 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         }
         prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
         devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
+
+
         if (devicePhoneNumber.length() != 11 && !devicePhoneNumber.startsWith("01")){
             showDlg(this);
         }
@@ -106,8 +107,6 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 Dialog alertDialog = builder.create();
                 alertDialog.setCanceledOnTouchOutside(false);
                 alertDialog.show();
-
-
             }
         }
 
@@ -120,10 +119,12 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         registerReceiver(regis,new IntentFilter(Constants.Signaling.USER_REGISTER_REQUEST_SIGNAL_PARAM));
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        assert wifiManager != null;
-        wifiManager.startScan();
-        getApplicationContext().registerReceiver(new WifiNetworkReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
+        //assert wifiManager != null;
+        if (wifiManager != null) {
+            wifiManager.startScan();
+            getApplicationContext().registerReceiver(new WifiNetworkReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        }
         // Get AbtoPhone instance
         abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
         boolean bCanStartPhoneInitialization = (Build.VERSION.SDK_INT >= 23) ?  askPermissions() : true;
@@ -145,8 +146,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
 
     BroadcastReceiver regis = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(Constants.TAG,"Incomming message from Splash Activity: "+intent.getStringExtra(Constants.Signaling.SIGNALING_MESSAGE));
+        public void onReceive(Context context, Intent intent) {Log.i(Constants.TAG,"Incomming message from Splash Activity: "+intent.getStringExtra(Constants.Signaling.SIGNALING_MESSAGE));
         }
     };
 
@@ -367,4 +367,29 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         dlg.show(activity.getFragmentManager(),Constants.SharedPref.ASK_NUMBER_DLG);
 
     }
+    private void requestRecordAudioPermission() {
+        //check API version, do nothing if API version < 23!
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentapiVersion > android.os.Build.VERSION_CODES.LOLLIPOP){
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+
+                    // Show an expanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+                }
+            }
+        }
+    }
+
+
 }
