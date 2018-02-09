@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -71,6 +72,8 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
 
         requestBasicPermissions();
         requestRecordAudioPermission();
+        ContactsAsyncTask task = new ContactsAsyncTask();
+        task.execute("Contacts");
 
         String phoneNumber = PhoneUtils.getPhoneNumber(this);
         if(phoneNumber!= null) {
@@ -143,15 +146,11 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
             final Handler handler = new Handler();
             handler.postDelayed(() -> {
                 Constants.setPhoneNumber(devicePhoneNumber);
-                try {
-                    Constants.users = getContactList();
-                }catch (SecurityException ex){
-
-                }
                 openHomeActivity();
-            }, 500);
+            }, 5000);
 
         }
+
     }
 
     BroadcastReceiver regis = new BroadcastReceiver() {
@@ -443,5 +442,22 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         return contacts;
     }
 
+    private class ContactsAsyncTask extends AsyncTask<String,Void,ArrayList<Contacts>> {
+        @Override
+        protected ArrayList<Contacts> doInBackground(String... users) {
+            // Perform the HTTP request for earthquake data and process the response.
+            try {
+                return getContactList();
+            }catch (SecurityException ex){
+                return null;
+            }
+        }
 
-}
+        @Override
+        protected void onPostExecute(ArrayList<Contacts> contacts) {
+            super.onPostExecute(contacts);
+            // If there is no result, do nothing.
+            if (contacts != null) Constants.users = contacts;
+            else return;
+        }
+    }}
