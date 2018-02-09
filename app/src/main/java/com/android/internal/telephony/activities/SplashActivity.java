@@ -27,6 +27,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -400,43 +401,49 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
     }
 
     private ArrayList<Contacts> getContactList() {
+        final String DISPLAY_NAME = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
+                ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME;
+
+        final String FILTER = DISPLAY_NAME + " NOT LIKE '%@%'";
+
+        final String ORDER = String.format("%1$s COLLATE NOCASE", DISPLAY_NAME);
+
+        final String[] PROJECTION = {
+                ContactsContract.Contacts._ID,
+                DISPLAY_NAME,
+                ContactsContract.Contacts.HAS_PHONE_NUMBER
+        };
+
         ArrayList<Contacts> contacts = new ArrayList<>();
-        String temp = "";String phoneNo;
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, ContactsContract.Contacts.SORT_KEY_PRIMARY);
 
-        if (cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                String id = cursor.getString( cursor.getColumnIndex( ContactsContract.Contacts._ID ) );
-                String name=cursor.getString( cursor.getColumnIndex( ContactsContract.Contacts.DISPLAY_NAME ) );
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, PROJECTION, FILTER, null, ORDER);
 
-                if (cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // get the contact's information
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
+                Integer hasPhone = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-                    Cursor pCur = contentResolver.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            new String[]{id},
-                            ContactsContract.CommonDataKinds.Phone.SORT_KEY_PRIMARY+" ASC");
-                    while (pCur.moveToNext()) {
-
-                        phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        phoneNo = phoneNo.replaceAll("[^0-9]", "");
-
-                        if (!phoneNo.equals(temp) && phoneNo.startsWith("01")) {
-                            temp = phoneNo;
-                            Contacts user = new Contacts(name, phoneNo);
-                            contacts.add(user);
-                        }
-                        //Log.i("Contacts", "Name: " + name);
-                        //Log.i("Contacts", "Phone Number: " + phoneNo);
+                // get the user's phone number
+                String phone = null;
+                if (hasPhone > 0) {
+                    Cursor cp = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+                    if (cp != null && cp.moveToFirst()) {
+                        phone = cp.getString(cp.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        cp.close();
                     }
-                    pCur.close();
+                }// if the user user has an email or phone then add it to contacts
+                if (!TextUtils.isEmpty(phone)) {
+                    phone = phone.replaceAll("[^0-9]", "");
+                    Contacts contact = new Contacts(name,phone);
+                    contacts.add(contact);
                 }
-            }
-        }
-        if(cursor!=null){
+            } while (cursor.moveToNext());
+
+            // clean up cursor
             cursor.close();
         }
         return contacts;

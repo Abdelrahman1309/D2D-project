@@ -55,6 +55,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home);
         identifyNumbers();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+            Intent i = getIntent();
+            String name = i.getStringExtra("name");
+            String number = i.getStringExtra("number");
+            mPhone.setText(number);
+
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -72,7 +83,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.star:mPhone.append("*");break;
             case R.id.hash:mPhone.append("#");break;
             case R.id.back_space:
-                mPhone.setText(mPhone.getText().toString().substring(0, mPhone.getText().toString().length() - 1));break;
+                try {
+                    mPhone.setText(mPhone.getText().toString().substring(0, mPhone.getText().toString().length() - 1));
+                }catch (Exception ex){
+
+                }
+                break;
             case R.id.call: checkNumber(); break;
             case R.id.contact:
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -81,6 +97,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 transaction.commit();
                 break;
         }
+
 
     }
 

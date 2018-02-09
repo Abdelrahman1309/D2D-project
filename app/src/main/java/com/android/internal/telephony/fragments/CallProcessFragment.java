@@ -63,6 +63,7 @@ public class CallProcessFragment extends Fragment {
         ImageView keypad  = v.findViewById(R.id.keypad);
         ImageView mute    = v.findViewById(R.id.mute);
         TextView displayNumber = v.findViewById(R.id.display_phone_num);
+        TextView displayName = v.findViewById(R.id.display_name);
         TextView timer = v.findViewById(R.id.timer);
 
         displayNumber.setText(phoneNumber);
