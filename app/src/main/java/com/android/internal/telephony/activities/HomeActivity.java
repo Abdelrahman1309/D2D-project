@@ -49,8 +49,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     SharedPreferences prefs;
     String devicePhoneNumber;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,11 +158,6 @@ private void makeCall(){
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-/*private void openContacts(){
-    Intent intent = new Intent(Intent.ACTION_DEFAULT, ContactsContract.Contacts.CONTENT_URI);
-    startActivityForResult(intent, 1);
-
-}*/
 private void checkNumber(){
     prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
     devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
@@ -172,65 +165,5 @@ private void checkNumber(){
     else {Toast toast = Toast.makeText(getApplicationContext(),"Invalid number", Toast.LENGTH_SHORT);
         toast.show();}
 }
-/*private ArrayList<Contacts> getContactList() {
-        ArrayList<Contacts> contacts = new ArrayList<>();
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, ContactsContract.Contacts.SORT_KEY_PRIMARY);
 
-        if (cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                String id = cursor.getString( cursor.getColumnIndex( ContactsContract.Contacts._ID ) );
-                String name=cursor.getString( cursor.getColumnIndex( ContactsContract.Contacts.DISPLAY_NAME ) );
-
-                if (cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-
-                    Cursor pCur = contentResolver.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            new String[]{id},
-                            ContactsContract.CommonDataKinds.Phone.SORT_KEY_PRIMARY+" ASC");
-                    while (pCur.moveToNext()) {
-                        String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        Contacts user = new Contacts( name , phoneNo );
-                        if ( !contacts.contains(user) ) contacts.add(user);
-                        Log.i("Contacts", "Name: " + name);
-                        Log.i("Contacts", "Phone Number: " + phoneNo);
-                    }
-                    pCur.close();
-                }
-            }
-        }
-        if(cursor!=null){
-            cursor.close();
-        }
-        return contacts;
-    }
-private class ContactsAsyncTask extends AsyncTask<String,Void,ArrayList<Contacts>> {
-    @Override
-    protected ArrayList<Contacts> doInBackground(String... urls) {
-        try {
-
-            ArrayList<Contacts> contacts = getContactList();
-            return contacts;
-        } catch (Exception e){
-            return null;
-        }
-    }
-    @Override
-    protected void onPostExecute(ArrayList<Contacts> contacts) {
-        super.onPostExecute(contacts);
-        // If there is no result, do nothing.
-        if (contacts != null){
-            List<Contacts> users = contacts;
-            Gson gson = new Gson();
-            String jsonContacts = gson.toJson(users);
-            SharedPreferences.Editor editor = getSharedPreferences(Constants.SharedPref.SHARED_PREF, Context.MODE_PRIVATE).edit();
-            editor.putString(Constants.SharedPref.SHARED_PREF_CONTACTS,jsonContacts);
-            editor.apply();
-        }
-        else return;
-    }
-}*/
 }

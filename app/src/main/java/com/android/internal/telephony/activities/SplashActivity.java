@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 //Todo (1) Check permissions and guarantee it - done
@@ -148,22 +149,24 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
 
                 }
                 openHomeActivity();
-            }, 100);
+            }, 500);
 
         }
     }
 
     BroadcastReceiver regis = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {Log.i(Constants.TAG,"Incomming message from Splash Activity: "+intent.getStringExtra(Constants.Signaling.SIGNALING_MESSAGE));
+        public void onReceive(Context context, Intent intent) {
+            Log.i(Constants.TAG,"Incomming message from Splash Activity: "+intent.getStringExtra
+                    (Constants.Signaling.SIGNALING_MESSAGE));
         }
     };
-
 
     private void openHomeActivity(){
         Intent i = new Intent(this,HomeActivity.class);
         startActivity(i);
     }
+
     private void requestBasicPermissions(){
         List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
@@ -189,8 +192,8 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                     REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
         }
     }
-    //region VOIP APP
 
+    //region VOIP APP
     AbtoPhone abtoPhone;
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
@@ -227,7 +230,6 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         return true;
     }
 
-
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             permissionsList.add(permission);
@@ -237,9 +239,6 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
 
         return true;
     }
-
-
-
 
     @TargetApi(23)
     @Override
@@ -277,8 +276,6 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
-
 
     @Override
     protected void onResume() {
@@ -369,8 +366,8 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
             }
         }); //registration listener
     }
-
     //endregion
+
     private static void showDlg(Activity activity){
         AskPhoneNumber dlg = new AskPhoneNumber();
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
@@ -378,6 +375,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         dlg.show(activity.getFragmentManager(),Constants.SharedPref.ASK_NUMBER_DLG);
 
     }
+
     private void requestRecordAudioPermission() {
         //check API version, do nothing if API version < 23!
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -401,8 +399,10 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
             }
         }
     }
+
     private ArrayList<Contacts> getContactList() {
         ArrayList<Contacts> contacts = new ArrayList<>();
+        String temp = "";String phoneNo;
         ContentResolver contentResolver = getContentResolver();
         Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
                 null, null, null, ContactsContract.Contacts.SORT_KEY_PRIMARY);
@@ -421,11 +421,17 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                             new String[]{id},
                             ContactsContract.CommonDataKinds.Phone.SORT_KEY_PRIMARY+" ASC");
                     while (pCur.moveToNext()) {
-                        String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        Contacts user = new Contacts( name , phoneNo );
-                        if ( !contacts.contains(user) ) contacts.add(user);
-                        Log.i("Contacts", "Name: " + name);
-                        Log.i("Contacts", "Phone Number: " + phoneNo);
+
+                        phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        phoneNo = phoneNo.replaceAll("[^0-9]", "");
+
+                        if (!phoneNo.equals(temp) && phoneNo.startsWith("01")) {
+                            temp = phoneNo;
+                            Contacts user = new Contacts(name, phoneNo);
+                            contacts.add(user);
+                        }
+                        //Log.i("Contacts", "Name: " + name);
+                        //Log.i("Contacts", "Phone Number: " + phoneNo);
                     }
                     pCur.close();
                 }
