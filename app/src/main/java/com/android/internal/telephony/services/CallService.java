@@ -59,22 +59,33 @@ public class CallService extends Service {
                 //Servers to receive from client
                 DatagramSocket serverSocket = new DatagramSocket(Constants.Calling.CALLING_SERVER_PORT);
                 serverSocket.setReuseAddress(true);
+
                 //buffer to receive from microphone
                 byte[] buffer = new byte[minBufSize];
+
                 //Instance for microphone
-                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
-                //Let microphone start recording sound
-                recorder.startRecording();
+                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                        Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
+
                 //Instance for speaker
-                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
+                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
+                        Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize*10,
+                        AudioTrack.MODE_STREAM);
+
                 //set speaker sapling rate
                 atrack.setPlaybackRate(Constants.Calling.SAMPLING_RATE);
+
+                //Let microphone start recording sound
+                recorder.startRecording();
+
                 //start speaker
                 atrack.play();
+
                 //While call is running
                 while (mRunCallingServer) {
                     //buffer to hold incoming sampled sound
                     byte[] receiveData = new byte[minBufSize];
+
                     //new instance for datagram recived packet
                     DatagramPacket receivePacket = new DatagramPacket(receiveData,
                             receiveData.length);
@@ -90,6 +101,8 @@ public class CallService extends Service {
                     //Send voice packet to destination
                     serverSocket.send(sendPacket);
                 }
+                recorder.stop();
+                recorder.release();
                 atrack.release();
                 observer.onComplete();
                 serverSocket.disconnect();
@@ -117,16 +130,22 @@ public class CallService extends Service {
             try{
                 //Address of destination call server
                 final InetAddress destination = InetAddress.getByName(serverIP);
+
                 //Servers to receive from client
                 DatagramSocket socket = new DatagramSocket();
+
                 //Instance for microphone
                 AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
+
                 //Let microphone start recording sound
                 recorder.startRecording();
+
                 //Instance for speaker
                 AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
+
                 //set speaker sapling rate
                 atrack.setPlaybackRate(Constants.Calling.SAMPLING_RATE);
+
                 //start speaker
                 atrack.play();
                 //While call is running

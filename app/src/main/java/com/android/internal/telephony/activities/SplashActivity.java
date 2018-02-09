@@ -5,11 +5,13 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -17,6 +19,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +31,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.internal.telephony.R;
+import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.receivers.WifiNetworkReceiver;
 import com.android.internal.telephony.services.CallService;
 import com.android.internal.telephony.services.IncomingVIOPCallService;
@@ -138,8 +142,13 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
             final Handler handler = new Handler();
             handler.postDelayed(() -> {
                 Constants.setPhoneNumber(devicePhoneNumber);
+                try {
+                    Constants.users = getContactList();
+                }catch (SecurityException ex){
+
+                }
                 openHomeActivity();
-            }, 3000);
+            }, 100);
 
         }
     }
@@ -245,6 +254,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.CAMERA,                 PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.USE_SIP,                PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.READ_CONTACTS,          PackageManager.PERMISSION_GRANTED);
 
                 //Fill with results
                 for (int i = 0; i < permissions.length; i++) perms.put(permissions[i], grantResults[i]);
@@ -253,7 +263,8 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 if (perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.USE_SIP) == PackageManager.PERMISSION_GRANTED) {
+                        && perms.get(Manifest.permission.USE_SIP) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                     // All Permissions Granted
                     initPhone();
                 } else {
@@ -389,6 +400,41 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 }
             }
         }
+    }
+    private ArrayList<Contacts> getContactList() {
+        ArrayList<Contacts> contacts = new ArrayList<>();
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, ContactsContract.Contacts.SORT_KEY_PRIMARY);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String id = cursor.getString( cursor.getColumnIndex( ContactsContract.Contacts._ID ) );
+                String name=cursor.getString( cursor.getColumnIndex( ContactsContract.Contacts.DISPLAY_NAME ) );
+
+                if (cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+
+                    Cursor pCur = contentResolver.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            new String[]{id},
+                            ContactsContract.CommonDataKinds.Phone.SORT_KEY_PRIMARY+" ASC");
+                    while (pCur.moveToNext()) {
+                        String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        Contacts user = new Contacts( name , phoneNo );
+                        if ( !contacts.contains(user) ) contacts.add(user);
+                        Log.i("Contacts", "Name: " + name);
+                        Log.i("Contacts", "Phone Number: " + phoneNo);
+                    }
+                    pCur.close();
+                }
+            }
+        }
+        if(cursor!=null){
+            cursor.close();
+        }
+        return contacts;
     }
 
 
