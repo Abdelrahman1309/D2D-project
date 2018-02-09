@@ -1,5 +1,6 @@
 package com.android.internal.telephony.activities;
 
+import android.app.ActionBar;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +21,10 @@ import android.telephony.SignalStrength;
 import android.util.Log;
 import android.view.View;
 import android.support.v4.app.Fragment;
+import android.view.Window;
 import android.widget.AlphabetIndexer;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +48,7 @@ import java.util.Set;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
     Button btn0,btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,star,hash,contact,recents;
     ImageView backSpace,mCall;
-    TextView mPhone;
+    EditText mPhone;TextView mName;
     SharedPreferences prefs;
     String devicePhoneNumber;
 
@@ -63,6 +66,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             String name = i.getStringExtra("name");
             String number = i.getStringExtra("number");
             mPhone.setText(number);
+            mName.setText(name);
 
     }
 
@@ -85,6 +89,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.back_space:
                 try {
                     mPhone.setText(mPhone.getText().toString().substring(0, mPhone.getText().toString().length() - 1));
+                    mName.setText("");
                 }catch (Exception ex){
 
                 }
@@ -116,6 +121,7 @@ private void identifyNumbers(){
     hash = findViewById(R.id.hash);
     mCall= findViewById(R.id.call);
     mPhone=findViewById(R.id.phoneNum);
+    mName=findViewById(R.id.name);
     backSpace=findViewById(R.id.back_space);
     contact=findViewById(R.id.contact);
     recents=findViewById(R.id.recents);

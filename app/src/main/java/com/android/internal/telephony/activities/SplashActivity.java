@@ -2,6 +2,7 @@ package com.android.internal.telephony.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -29,6 +30,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -70,7 +72,6 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         requestBasicPermissions();
         requestRecordAudioPermission();
         ContactsAsyncTask task = new ContactsAsyncTask();
@@ -438,6 +439,8 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 }// if the user user has an email or phone then add it to contacts
                 if (!TextUtils.isEmpty(phone)) {
                     phone = phone.replaceAll("[^0-9]", "");
+                    if (phone.startsWith("2"))phone = phone.substring(1);
+                    if (phone.startsWith("00"))phone = phone.substring(1);
                     Contacts contact = new Contacts(name,phone);
                     contacts.add(contact);
                 }

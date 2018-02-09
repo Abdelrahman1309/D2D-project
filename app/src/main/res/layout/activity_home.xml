@@ -25,6 +25,8 @@
             android:layout_weight="1"
             android:background="@drawable/rounded_edittext"
             android:hint="Search"
+            android:fontFamily="casual"
+            android:textSize="16dp"
             android:padding="8dp"
             android:paddingLeft="16dp" />
 
@@ -43,6 +45,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textStyle="bold"
+            android:fontFamily="casual"
             android:text="recents" />
 
         <Button
@@ -50,9 +54,21 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textStyle="bold"
+            android:fontFamily="casual"
             android:text="contacts" />
     </LinearLayout>
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/name"
+            android:layout_weight="8"
+            android:minHeight="50dp"
+            android:gravity="center"
+            android:textSize="30dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="casual"
+            android:layout_marginBottom="8dp"/>
 
     <View
         android:layout_width="match_parent"
@@ -65,15 +81,17 @@
         android:layout_weight="8"
         android:orientation="horizontal">
 
-        <TextView
+        <EditText
             android:id="@+id/phoneNum"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:ems="10"
-            android:textSize="36dp"
-            android:fontFamily="sans-serif"
+            android:textSize="30dp"
+            android:fontFamily="casual"
+            android:inputType="none"
+            android:textStyle="bold"
             android:gravity="center"
             android:minHeight="50dp" />
 
@@ -103,9 +121,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="1"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/btn2"
@@ -113,10 +132,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="2"
             android:layout_gravity="center_vertical"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/btn3"
@@ -124,10 +144,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="3"
             android:layout_gravity="center_vertical"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -144,9 +165,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="4"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/btn5"
@@ -155,9 +177,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="5"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/btn6"
@@ -166,9 +189,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="6"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -185,9 +209,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="7"
-            android:textSize="36dp"/>
+            android:textStyle="bold"
+            android:textSize="30dp"/>
 
         <Button
             android:id="@+id/btn8"
@@ -196,9 +221,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="8"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/btn9"
@@ -207,9 +233,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="9"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -226,9 +253,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="*"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/btn0"
@@ -237,9 +265,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="0"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/hash"
@@ -248,9 +277,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:fontFamily="sans-serif"
+            android:fontFamily="casual"
             android:text="#"
-            android:textSize="36dp" />
+            android:textStyle="bold"
+            android:textSize="30dp" />
     </LinearLayout>
 
     <ImageView
