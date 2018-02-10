@@ -34,9 +34,9 @@ public class CallService extends Service {
     private Observable<Void> mCallInstance;
     private boolean mRunCallingServer = false;
     private boolean mRunCallingInstance = false;
-    private static int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-    private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    static int minBufSize = AudioRecord.getMinBufferSize(Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat);
+    private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    int minBufSize = AudioRecord.getMinBufferSize(Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat);
 
     private static String mTag;
     private CompositeDisposable mDisposable = new CompositeDisposable();
@@ -56,6 +56,7 @@ public class CallService extends Service {
         mCallServer = Observable.create(observer ->{
             try{
                 Log.i(mTag,"Call Server started");
+
                 //Servers to receive from client
                 DatagramSocket serverSocket = new DatagramSocket(Constants.Calling.CALLING_SERVER_PORT);
                 serverSocket.setReuseAddress(true);
@@ -64,19 +65,16 @@ public class CallService extends Service {
                 byte[] buffer = new byte[minBufSize];
 
                 //Instance for microphone
-                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                        Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
-
-                //Instance for speaker
-                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
-                        Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize*10,
-                        AudioTrack.MODE_STREAM);
-
-                //set speaker sapling rate
-                atrack.setPlaybackRate(Constants.Calling.SAMPLING_RATE);
+                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
 
                 //Let microphone start recording sound
                 recorder.startRecording();
+
+                //Instance for speaker
+                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
+
+                //set speaker sapling rate
+                atrack.setPlaybackRate(Constants.Calling.SAMPLING_RATE);
 
                 //start speaker
                 atrack.play();
@@ -85,7 +83,6 @@ public class CallService extends Service {
                 while (mRunCallingServer) {
                     //buffer to hold incoming sampled sound
                     byte[] receiveData = new byte[minBufSize];
-
                     //new instance for datagram recived packet
                     DatagramPacket receivePacket = new DatagramPacket(receiveData,
                             receiveData.length);
@@ -96,20 +93,17 @@ public class CallService extends Service {
                     atrack.write(receivePacket.getData(), 0, receivePacket.getLength());
 
                     recorder.read(buffer, 0, buffer.length);
+
                     //putting buffer in the packet
                     DatagramPacket sendPacket = new DatagramPacket (buffer,buffer.length,receivePacket.getAddress(),receivePacket.getPort());
+
                     //Send voice packet to destination
                     serverSocket.send(sendPacket);
                 }
-                recorder.stop();
-                recorder.release();
                 atrack.release();
                 observer.onComplete();
                 serverSocket.disconnect();
-            }catch (Exception ex){
-                observer.onError(ex);
-                Log.w("Call server","Failed to start");
-            }
+            }catch (Exception ex){observer.onError(ex);}
         });
     }
     private void startCallServer(){
@@ -128,6 +122,7 @@ public class CallService extends Service {
     private void createCallInstance(String serverIP){
         mCallInstance = Observable.create(obs->{
             try{
+
                 //Address of destination call server
                 final InetAddress destination = InetAddress.getByName(serverIP);
 
@@ -148,23 +143,31 @@ public class CallService extends Service {
 
                 //start speaker
                 atrack.play();
+
                 //While call is running
                 while (mRunCallingInstance) {
+
                     //buffer to receive from microphone
                     byte[] buffer = new byte[minBufSize];
                     recorder.read(buffer, 0, buffer.length);
+
                     //putting buffer in the packet
                     DatagramPacket sendPacket = new DatagramPacket (buffer,buffer.length,destination,Constants.Calling.CALLING_SERVER_PORT);
+
                     //Send voice packet to destination
                     socket.send(sendPacket);
                     Log.i(Constants.TAG,"call instance sent data its length is: "+sendPacket.getData().length);
+
                     //buffer to hold incoming sampled sound
                     byte[] receiveData = new byte[minBufSize];
+
                     //new instance for datagram recived packet
                     DatagramPacket receivePacket = new DatagramPacket(receiveData,
                             receiveData.length);
+
                     //receive data from server socket and hold it in receivePacket
                     socket.receive(receivePacket);
+
                     //write recived data to speaker
                     atrack.write(receivePacket.getData(), 0, receivePacket.getLength());
                 }

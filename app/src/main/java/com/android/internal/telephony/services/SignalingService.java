@@ -119,7 +119,7 @@ public class SignalingService extends Service {
                     @Override
                     public void onNext(String incomeMessage) {
                         //Here we must send app broadcast with specific action like Constants.Signaling.CALL_INVITATION_SIGNAL_PARAM to notify any app component with the new request
-                        Log.i(mTag,"New network message: " + incomeMessage);
+                        Log.i(mTag,"New network message: " + incomeMessage.substring(0,40));
 
                         String action;
                         if(incomeMessage.startsWith("_invite_")) {

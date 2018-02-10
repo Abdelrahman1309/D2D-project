@@ -32,7 +32,7 @@ import static android.content.Context.SENSOR_SERVICE;
 //Todo (2) End calls
 public class CallProcessFragment extends Fragment {
     String phoneNumber;
-
+    TextView displayNumber;
     public CallProcessFragment() {
         // Required empty public constructor
     }
@@ -41,18 +41,6 @@ public class CallProcessFragment extends Fragment {
         phoneNumber = number;
     }
 
-    /*private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("CALL_ACCEPTED")) {
-                Intent i = new Intent();
-                i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
-
-            }else if(intent.getAction().equals("CALL_ENDED")) {
-
-            }
-        }
-    };*/
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,7 +50,7 @@ public class CallProcessFragment extends Fragment {
         ImageView speaker = v.findViewById(R.id.speaker);
         ImageView keypad  = v.findViewById(R.id.keypad);
         ImageView mute    = v.findViewById(R.id.mute);
-        TextView displayNumber = v.findViewById(R.id.display_phone_num);
+        displayNumber = v.findViewById(R.id.display_phone_num);
         TextView displayName = v.findViewById(R.id.display_name);
         TextView timer = v.findViewById(R.id.timer);
 
@@ -86,5 +74,6 @@ public class CallProcessFragment extends Fragment {
 
     private  void endCall(){
         ((CallActivity)getActivity()).endCall();
+        displayNumber.clearComposingText();
     }
 }

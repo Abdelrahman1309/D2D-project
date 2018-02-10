@@ -144,11 +144,11 @@ private void identifyNumbers(){
     recents.setOnClickListener(this);
 }
 private void makeCall(){
+
         String phoneNum = mPhone.getText().toString();
         Intent i = new Intent(this,CallActivity.class);
         i.putExtra("PHONE_NUM",phoneNum);
         i.putExtra("CALL_TYPE","OUTGOING");
-
 
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

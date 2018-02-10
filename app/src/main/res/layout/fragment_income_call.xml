@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Incomming Call"
+            tools:text="Incomming Call"
             android:textColor="@android:color/white"
             android:layout_marginBottom="64dp"/>
         <TextView
@@ -27,7 +27,7 @@
             android:id="@+id/income_phone_num"
             android:textSize="36sp"
             android:gravity="center"
-            android:text="Phone Number"
+            tools:text="Phone Number"
             android:textColor="@android:color/white"
             android:layout_marginBottom="128dp"/>
 
@@ -59,7 +59,3 @@
     </LinearLayout>
 
 </RelativeLayout>
-
-    <!-- TODO: Update blank fragment layout
-        android:id="@+id/answerCallFrag"
-        android:id="@+id/rejectCallFrag"-->

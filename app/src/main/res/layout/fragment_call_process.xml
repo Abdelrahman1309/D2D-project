@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dialling"
+            tools:text="Dialling"
             android:id="@+id/timer"
             android:textColor="@android:color/white"
             android:layout_marginBottom="64dp"/>
@@ -28,7 +28,7 @@
             android:id="@+id/display_name"
             android:textSize="36dp"
             android:gravity="center"
-            android:text="Name"
+            tools:text="Unknown Number"
             android:textColor="@android:color/white" />
         <TextView
             android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:id="@+id/display_phone_num"
             android:textSize="30dp"
             android:gravity="center"
-            android:text="Phone Number"
+            tools:text="Phone Number"
             android:textColor="@android:color/white"
             android:layout_marginBottom="128dp"/>
 

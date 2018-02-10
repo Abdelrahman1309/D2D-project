@@ -26,6 +26,7 @@ import butterknife.OnClick;
 public class IncomeCallFragment extends Fragment {
     String incomePhoneNumber;
     String callTechnology;
+    TextView displayIncomePhoneNum;
     Uri ringTone;
     Ringtone r;
 
@@ -46,10 +47,10 @@ public class IncomeCallFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_income_call, container, false);
         ImageView mAnswer = v.findViewById(R.id.answerCallFrag);
         ImageView mReject = v.findViewById(R.id.rejectCallFrag);
-        TextView displayIncomePhoneNum = v.findViewById(R.id.income_phone_num);
+        displayIncomePhoneNum = v.findViewById(R.id.income_phone_num);
 
         displayIncomePhoneNum.setText(incomePhoneNumber);
-        if ( callTechnology == "D2D" ) {
+        if ( callTechnology.equals("D2D") ) {
             ringTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
             r = RingtoneManager.getRingtone(getContext(), ringTone);
             r.play();
@@ -57,6 +58,7 @@ public class IncomeCallFragment extends Fragment {
 
         mAnswer.setOnClickListener(v1 -> {
             onAnswerClicked();
+            displayIncomePhoneNum.clearComposingText();
             try {
                 r.stop();
             }catch (NullPointerException ex){
@@ -66,6 +68,7 @@ public class IncomeCallFragment extends Fragment {
 
         mReject.setOnClickListener(v1 -> {
             onRejectClicked();
+            displayIncomePhoneNum.clearComposingText();
             try {
                 r.stop();
             }catch (NullPointerException ex){

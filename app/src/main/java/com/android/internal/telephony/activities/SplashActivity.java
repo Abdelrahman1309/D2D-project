@@ -159,7 +159,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(Constants.TAG,"Incomming message from Splash Activity: "+intent.getStringExtra
-                    (Constants.Signaling.SIGNALING_MESSAGE));
+                    (Constants.Signaling.SIGNALING_MESSAGE).substring(0,40));
         }
     };
 
@@ -317,6 +317,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
     public void onDestroy() {
         abtoPhone.setInitializeListener(null);
         super.onDestroy();
+        unregisterReceiver(regis);
 
     }//onDestroy
 
