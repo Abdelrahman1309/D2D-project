@@ -124,8 +124,13 @@ public class CallActivity extends FragmentActivity {
                 mIncomePhoneNumber = mIntent.getStringExtra("PHONE_NUM");
                 Log.i(TAG, String.format("Incoming Phone ip is: %s",mDeviceIP));
             }
+            else if (mCallTech!= null && mIntent.getStringExtra("CALL_TECH").equals("VOIP")) {
+                mIncomePhoneNumber = mIntent.getStringExtra(AbtoPhone.REMOTE_CONTACT);
+                mIncomePhoneNumber = mIncomePhoneNumber.substring(1,12);
+                Log.i(TAG, String.format("Incoming Phone no is: %s",mIncomePhoneNumber));
+            }
             //Case incoming call p ush Call incoming call fragment
-            pushIncomingCallFragment(mIncomePhoneNumber);
+            pushIncomingCallFragment(mIncomePhoneNumber,mIntent.getStringExtra("CALL_TECH"));
         }
 
     }
@@ -197,9 +202,10 @@ public class CallActivity extends FragmentActivity {
         sendBroadcast(i);
         Log.i(TAG,"BroadCast sent");
     }
-    private void pushIncomingCallFragment(String phoneNumber) {
+    private void pushIncomingCallFragment(String phoneNumber, String tech) {
         if(mCallFragment == null) mCallFragment = new IncomeCallFragment();
         mCallFragment.setPhoneNumber(phoneNumber);
+        mCallFragment.callTech(tech);
         mCallFragment.setArguments(mIntent.getExtras());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragsContainer,mCallFragment)

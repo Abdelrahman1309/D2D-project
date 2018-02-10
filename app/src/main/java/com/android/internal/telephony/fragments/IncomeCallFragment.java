@@ -25,12 +25,18 @@ import butterknife.OnClick;
 //Todo (2) Interact with Service
 public class IncomeCallFragment extends Fragment {
     String incomePhoneNumber;
+    String callTechnology;
+    Uri ringTone;
+    Ringtone r;
 
     public IncomeCallFragment() {
         // Required empty public constructor
     }
     public void setPhoneNumber(String number){
         incomePhoneNumber = number;
+    }
+    public void callTech(String tech){
+        callTechnology = tech;
     }
 
     @Override
@@ -43,19 +49,28 @@ public class IncomeCallFragment extends Fragment {
         TextView displayIncomePhoneNum = v.findViewById(R.id.income_phone_num);
 
         displayIncomePhoneNum.setText(incomePhoneNumber);
-
-        Uri ringTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-        Ringtone r = RingtoneManager.getRingtone(getContext(), ringTone);
-        r.play();
+        if ( callTechnology == "D2D" ) {
+            ringTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            r = RingtoneManager.getRingtone(getContext(), ringTone);
+            r.play();
+        }
 
         mAnswer.setOnClickListener(v1 -> {
             onAnswerClicked();
-            r.stop();
+            try {
+                r.stop();
+            }catch (NullPointerException ex){
+
+            }
         });
 
         mReject.setOnClickListener(v1 -> {
             onRejectClicked();
-            r.stop();
+            try {
+                r.stop();
+            }catch (NullPointerException ex){
+
+            }
         });
 
         return v;

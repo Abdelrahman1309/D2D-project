@@ -285,16 +285,23 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
     }
 
     protected void initPhone() {
-        Log.i("VOIP__","Start Initialize voip");
+        Log.i("VOIP ","Start Initialize voip");
         abtoPhone.setInitializeListener(this);
 
         //configure phone instance
         AbtoPhoneCfg config = abtoPhone.getConfig();
-        config.setCodecPriority(Codec.G729, (short) 0);
-        config.setCodecPriority(Codec.PCMU, (short) 250);
-        config.setCodecPriority(Codec.PCMA, (short) 240);
-        config.setCodecPriority(Codec.GSM, (short) 0);
+        config.setCodecPriority(Codec.G729, (short)250);
+        config.setCodecPriority(Codec.PCMU, (short)200);
+        config.setCodecPriority(Codec.GSM, (short)150);
+        config.setCodecPriority(Codec.PCMA, (short)100);
+        config.setCodecPriority(Codec.speex_16000, (short)50);
 
+        //Set port
+        config.setSipPort(5060);
+
+        //Set timeouts
+        config.setRegisterTimeout(5000);
+        config.setHangupTimeout(3000);
 
         config.setSignallingTransport(AbtoPhoneCfg.SignalingTransportType.UDP);
 
@@ -304,7 +311,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         // Start initializing - !has to be invoked only once, when  app started!
         abtoPhone.initialize();
 
-        Log.i("VOIP__","Done initialize");
+        Log.i("VOIP ","Done initialize");
     }
 
     public void onDestroy() {
@@ -339,10 +346,12 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
     }
 
     private void registerToServer() {
-        Log.i("VOIP__","registerToServer");
-        String user = "01017005710";
-        String pass = "ab01017005710";
-        String domain = "192.168.1.3";
+        Log.i("VOIP ","registerToServer");
+        prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
+        devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
+        String user = devicePhoneNumber;
+        String pass = "ab" + devicePhoneNumber;
+        String domain = "192.168.1.4";
         abtoPhone.getConfig().addAccount(domain, null, user, pass, null, "", 300, false);
         try{
             abtoPhone.register();
