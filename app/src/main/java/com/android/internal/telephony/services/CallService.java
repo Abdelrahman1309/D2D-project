@@ -34,7 +34,7 @@ public class CallService extends Service {
     private Observable<Void> mCallInstance;
     private boolean mRunCallingServer = false;
     private boolean mRunCallingInstance = false;
-    private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+    private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     int minBufSize = AudioRecord.getMinBufferSize(Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat);
 
@@ -43,7 +43,6 @@ public class CallService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         mTag = this.getClass().getSimpleName();
 
         Log.i(mTag,"CAll Service Created");
@@ -53,6 +52,7 @@ public class CallService extends Service {
     }
 
     private void createCallServer(){
+        Log.w("min Buffer","size" + minBufSize);
         mCallServer = Observable.create(observer ->{
             try{
                 Log.i(mTag,"Call Server started");
@@ -65,13 +65,14 @@ public class CallService extends Service {
                 byte[] buffer = new byte[minBufSize];
 
                 //Instance for microphone
-                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
+                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,
+                        channelConfig,audioFormat,minBufSize*10);
 
                 //Let microphone start recording sound
                 recorder.startRecording();
-
                 //Instance for speaker
-                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
+                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE,
+                        channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
 
                 //set speaker sapling rate
                 atrack.setPlaybackRate(Constants.Calling.SAMPLING_RATE);
@@ -81,6 +82,10 @@ public class CallService extends Service {
 
                 //While call is running
                 while (mRunCallingServer) {
+                    if(recorder.getRecordingState() == AudioRecord.RECORDSTATE_STOPPED
+                            || recorder.getState() == AudioRecord.STATE_UNINITIALIZED){
+                        recorder.startRecording();
+                    }
                     //buffer to hold incoming sampled sound
                     byte[] receiveData = new byte[minBufSize];
                     //new instance for datagram recived packet
@@ -95,7 +100,8 @@ public class CallService extends Service {
                     recorder.read(buffer, 0, buffer.length);
 
                     //putting buffer in the packet
-                    DatagramPacket sendPacket = new DatagramPacket (buffer,buffer.length,receivePacket.getAddress(),receivePacket.getPort());
+                    DatagramPacket sendPacket = new DatagramPacket (buffer,buffer.length,receivePacket.getAddress(),
+                            receivePacket.getPort());
 
                     //Send voice packet to destination
                     serverSocket.send(sendPacket);
@@ -130,13 +136,15 @@ public class CallService extends Service {
                 DatagramSocket socket = new DatagramSocket();
 
                 //Instance for microphone
-                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,channelConfig,audioFormat,minBufSize*10);
+                AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,
+                        channelConfig,audioFormat,minBufSize*10);
 
                 //Let microphone start recording sound
                 recorder.startRecording();
 
                 //Instance for speaker
-                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE, channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
+                AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE,
+                        channelConfig, audioFormat, minBufSize, AudioTrack.MODE_STREAM);
 
                 //set speaker sapling rate
                 atrack.setPlaybackRate(Constants.Calling.SAMPLING_RATE);
@@ -146,6 +154,10 @@ public class CallService extends Service {
 
                 //While call is running
                 while (mRunCallingInstance) {
+                    if(recorder.getRecordingState() == AudioRecord.RECORDSTATE_STOPPED
+                            || recorder.getState() == AudioRecord.STATE_UNINITIALIZED){
+                        recorder.startRecording();
+                    }
 
                     //buffer to receive from microphone
                     byte[] buffer = new byte[minBufSize];

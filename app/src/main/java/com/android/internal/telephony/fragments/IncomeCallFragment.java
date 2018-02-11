@@ -10,16 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 //Todo (1) Display call from and accept and reject call
 //Todo (2) Interact with Service
@@ -90,4 +86,13 @@ public class IncomeCallFragment extends Fragment {
         ((CallActivity)getActivity()).endCall();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            r.stop();
+        }catch (NullPointerException ex){
+
+        }
+    }
 }
