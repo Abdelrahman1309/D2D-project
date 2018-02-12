@@ -51,6 +51,7 @@ public class CallService extends Service {
         registerReceiver(mCallServiceReceiver,callServiceIntentFilter);
     }
 
+    //Call Server = Incoming call
     private void createCallServer(){
         Log.w("min Buffer","size" + minBufSize);
         mCallServer = Observable.create(observer ->{
@@ -106,6 +107,7 @@ public class CallService extends Service {
                     //Send voice packet to destination
                     serverSocket.send(sendPacket);
                 }
+                recorder.release();
                 atrack.release();
                 observer.onComplete();
                 serverSocket.disconnect();
@@ -125,6 +127,7 @@ public class CallService extends Service {
                 );
     }
 
+    //Call instance = Outgoing call
     private void createCallInstance(String serverIP){
         mCallInstance = Observable.create(obs->{
             try{
@@ -133,7 +136,7 @@ public class CallService extends Service {
                 final InetAddress destination = InetAddress.getByName(serverIP);
 
                 //Servers to receive from client
-                DatagramSocket socket = new DatagramSocket();
+                DatagramSocket socket = new DatagramSocket(Constants.Calling.CALLING_SERVER_PORT + 1000);
 
                 //Instance for microphone
                 AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,Constants.Calling.SAMPLING_RATE,
@@ -183,8 +186,10 @@ public class CallService extends Service {
                     //write recived data to speaker
                     atrack.write(receivePacket.getData(), 0, receivePacket.getLength());
                 }
+                recorder.release();
                 atrack.release();
                 obs.onComplete();
+                socket.disconnect();
             }catch (Exception ex) {obs.onError(ex);}
         });
     }
@@ -221,7 +226,7 @@ public class CallService extends Service {
             }
             if(ip == null){
                 mRunCallingServer = true;
-                mRunCallingInstance = true;
+                //mRunCallingInstance = true;
                 startCallServer();
             }else{
                 mRunCallingInstance = true;
