@@ -152,10 +152,6 @@ public class CallActivity extends FragmentActivity {
             i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
             i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE,"_accept_");
             sendBroadcast(i);
-            Intent intent = new Intent();
-            intent.setAction(Constants.Calling.CALL_SERVICE_ACTION);
-            intent.putExtra("ACCEPT","ACCEPT");
-            sendBroadcast(intent);
         }else if(mCallTech.equals("VOIP")){
             AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
             try {
@@ -186,8 +182,6 @@ public class CallActivity extends FragmentActivity {
             i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE,"_end_");
             i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS,mDeviceIP);
             sendBroadcast(i);
-            stopService(new Intent(this, CallService.class));
-            startService(new Intent(this, CallService.class));
             //finish this activity
             this.finish();
         }else if(mCallTech.equals("VOIP")){
