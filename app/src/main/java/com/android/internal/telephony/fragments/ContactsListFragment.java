@@ -127,8 +127,13 @@ public class ContactsListFragment extends Fragment {
         //START ACTIVITY
         getActivity().startActivity(i);
     }
-    private  void updateUI (ArrayList<Contacts> contacts){
-        listView.setAdapter(new ContactsAdapter(getActivity(), contacts));
+    private  void updateUI (ArrayList<Contacts> contact){
+        listView.setAdapter(new ContactsAdapter(getActivity(), contact));
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            String user = contact.get(position).getContactName();
+            String num = contact.get(position).getContactNumber();
+            sendData(user,num);
+        });
     }
 
 }
