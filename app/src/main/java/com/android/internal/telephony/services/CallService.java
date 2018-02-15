@@ -193,9 +193,5 @@ public class CallService extends Service {
             //Todo Implement open call instance action
         }
     };
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mCallServiceReceiver);
-    }
+
 }
