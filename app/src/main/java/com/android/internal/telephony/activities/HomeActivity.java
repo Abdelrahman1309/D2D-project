@@ -18,14 +18,18 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
+import android.text.Layout;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.v4.app.Fragment;
 import android.view.Window;
 import android.widget.AlphabetIndexer;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,9 +50,12 @@ import java.util.Set;
 //Todo (2) Send Phone Call Intent to CallActivity
 //Todo (3) Display Powers
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
+    FragmentTransaction transaction;
     Button btn0,btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,star,hash,contact,recents;
     ImageView backSpace,mCall;
     EditText mPhone;TextView mName;
+    SearchView search;
+    FrameLayout searchBar;
     SharedPreferences prefs;
     String devicePhoneNumber;
 
@@ -57,6 +64,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         identifyNumbers();
+        searchBar.setVisibility(View.VISIBLE);
+
+
     }
 
     @Override
@@ -67,7 +77,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             String number = i.getStringExtra("number");
             mPhone.setText(number);
             mName.setText(name);
+            searchBar.setVisibility(View.VISIBLE);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        searchBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -96,7 +113,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.call: checkNumber(); break;
             case R.id.contact:
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_contacts,new ContactsListFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
+                break;
+            case R.id.search_frame:
+                searchBar.setVisibility(View.INVISIBLE);
+                transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_contacts,new ContactsListFragment());
                 transaction.addToBackStack(null);
                 transaction.commit();
@@ -125,6 +149,9 @@ private void identifyNumbers(){
     backSpace=findViewById(R.id.back_space);
     contact=findViewById(R.id.contact);
     recents=findViewById(R.id.recents);
+    search=findViewById(R.id.search);
+    searchBar=findViewById(R.id.search_frame);
+
 
     btn0.setOnClickListener(this);
     btn1.setOnClickListener(this);
@@ -142,6 +169,7 @@ private void identifyNumbers(){
     mCall.setOnClickListener(this);
     contact.setOnClickListener(this);
     recents.setOnClickListener(this);
+    searchBar.setOnClickListener(this);
 }
 private void makeCall(){
 

@@ -15,12 +15,16 @@ import com.android.internal.telephony.fragments.ContactsListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class ContactsAdapter<C> extends ArrayAdapter<Contacts> {
-
-    public ContactsAdapter (Context context, ArrayList<Contacts> contacts){
-        super(context,0,contacts);
+    private List<Contacts> contactsList = null;
+    private ArrayList<Contacts> contacts;
+    public ContactsAdapter (Context context, ArrayList<Contacts> contact){
+        super(context,0,contact);
+        contacts = contact;
+        contactsList = contact;
     }
     @Override
     public View getView(int position, @Nullable View convertView, ViewGroup parent) {
@@ -38,4 +42,5 @@ public class ContactsAdapter<C> extends ArrayAdapter<Contacts> {
 
         return listItemView;
     }
+
 }

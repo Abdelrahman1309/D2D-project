@@ -8,7 +8,6 @@
     tools:context="com.android.internal.telephony.activities.HomeActivity">
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,16 +18,17 @@
         android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
-        <EditText
+        <SearchView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:id="@+id/search"
             android:background="@drawable/rounded_edittext"
-            android:hint="Search"
+            android:queryHint="Search"
+            android:iconifiedByDefault="false"
             android:fontFamily="casual"
             android:textSize="16dp"
-            android:padding="8dp"
-            android:paddingLeft="16dp" />
+            android:padding="8dp"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -293,6 +293,13 @@
     <FrameLayout
         android:id="@+id/fragment_contacts"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp">
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/search_frame"
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:layout_marginRight="55dp">
     </FrameLayout>
 </RelativeLayout>

@@ -95,7 +95,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         NetworkUtils.turnOnWifi(this);
         Constants.setDeviceIP(NetworkUtils.getWifiApIpAddress());
 
-
+/*
         //open location if turned off
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 //        assert lm != null;
@@ -119,7 +119,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 alertDialog.show();
             }
         }
-
+*/
 
         //Start signaling service
         startService(new Intent(this, SignalingService.class));
