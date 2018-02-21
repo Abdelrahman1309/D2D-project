@@ -40,7 +40,7 @@ public final class Constants {
 
     public static final class Calling{
         public static final String CALL_SERVICE_ACTION = "CALL_SERVICE_ACTION";
-        public static final short CALLING_SERVER_PORT = 8975;
+        public static final int CALLING_SERVER_PORT = 50000;
 
         public static final String MAKE_CALL_ACTION_PARAM = "MAKE_CALL_ACTION";
         public static final String INCOMING_SIGNAL_ACTION = "SIGNALING_SERVICE_ACTION";

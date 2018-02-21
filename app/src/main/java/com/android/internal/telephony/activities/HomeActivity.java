@@ -1,30 +1,14 @@
 package com.android.internal.telephony.activities;
 
-import android.app.ActionBar;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.PhoneStateListener;
-import android.telephony.SignalStrength;
-import android.text.Layout;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.support.v4.app.Fragment;
-import android.view.Window;
-import android.widget.AlphabetIndexer;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -32,19 +16,9 @@ import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.internal.telephony.R;
-import com.android.internal.telephony.contacts.Contacts;
-import com.android.internal.telephony.fragments.CallProcessFragment;
 import com.android.internal.telephony.fragments.ContactsListFragment;
-import com.android.internal.telephony.fragments.IncomeCallFragment;
 import com.android.internal.telephony.utils.Constants;
-import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 //Todo (1) Receive New wifi networks
 //Todo (2) Send Phone Call Intent to CallActivity
