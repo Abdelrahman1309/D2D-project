@@ -23,7 +23,7 @@ import org.abtollc.sdk.AbtoPhone;
 
 /**
  * There are two components can fire this activity
- * @link HomeActivity
+ * @link {HomeActivity.class}
  * @link SignlingService
  *
  * This activity will manage call events:
@@ -53,7 +53,7 @@ public class CallActivity extends FragmentActivity {
         public void onReceive(Context context, Intent intent) {
             //In case user accept call
             //open call Instance by sending broadcast to calling service
-            if(intent.getAction().equals("CALL_ACCEPTED")) {
+            if(intent.getAction()!= null && intent.getAction().equals("CALL_ACCEPTED")) {
                 Intent i = new Intent();
                 i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
                 i.putExtra(Constants.Calling.MAKE_CALL_ACTION_PARAM, mDeviceIP);
@@ -61,9 +61,9 @@ public class CallActivity extends FragmentActivity {
                 try {
                     pushCallProcessFragment(mDevicePhoneNumber);
                 }catch (IllegalStateException ex){
-
+                    Log.e(TAG,"There are an error in CallActivity. ",ex);
                 }
-            }else if(intent.getAction().equals("CALL_ENDED")) {
+            }else if(intent.getAction()!= null && intent.getAction().equals("CALL_ENDED")) {
                 CallActivity.this.finish();
             }
         }
@@ -156,9 +156,7 @@ public class CallActivity extends FragmentActivity {
             AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
             try {
                 abtoPhone.answerCall(200);
-                abtoPhone.setCallDisconnectedListener((s, i, i1) -> {
-                    this.finish();
-                });
+                abtoPhone.setCallDisconnectedListener((s, i, i1) -> this.finish());
                 pushCallProcessFragment(mDevicePhoneNumber);
             } catch (RemoteException e) {
                 e.printStackTrace();
