@@ -95,32 +95,6 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         NetworkUtils.turnOnWifi(this);
         Constants.setDeviceIP(NetworkUtils.getWifiApIpAddress());
 
-/*
-        //open location if turned off
-        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-//        assert lm != null;
-
-
-
-        if(lm!=null) {
-            if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                    !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                // Build the alert dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Location Services Not Active");
-                builder.setMessage("Please enable Location Services and GPS");
-                builder.setPositiveButton("OK", (dialogInterface, i) -> {
-                    // Show location settings when the user acknowledges the alert dialog
-                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(intent);
-                });
-                Dialog alertDialog = builder.create();
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
-            }
-        }
-*/
-
         //Start signaling service
         startService(new Intent(this, SignalingService.class));
         startService(new Intent(this, CallService.class));

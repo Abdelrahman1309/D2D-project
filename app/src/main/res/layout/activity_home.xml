@@ -292,14 +292,19 @@
     </LinearLayout>
     <FrameLayout
         android:id="@+id/fragment_contacts"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="50dp">
     </FrameLayout>
     <FrameLayout
         android:id="@+id/search_frame"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_marginRight="55dp">
+        android:layout_marginRight="54dp">
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/fragment_logs"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
     </FrameLayout>
 </RelativeLayout>

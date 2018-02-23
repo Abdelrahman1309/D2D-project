@@ -1,42 +1,30 @@
 package com.android.internal.telephony.fragments;
 
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import android.provider.ContactsContract;
-import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 import android.widget.SearchView;
-
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.HomeActivity;
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.ContactsAdapter;
 import com.android.internal.telephony.utils.Constants;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
 
 public class ContactsListFragment extends Fragment {
-    SearchView editsearch;
+    SearchView editSearch;
     ListView listView;
     ArrayList<Contacts> contacts;
-    ContactsAdapter adapter = null;
     int numberOfContacts;
     public ContactsListFragment(){
         // Required empty public constructor
@@ -49,15 +37,12 @@ public class ContactsListFragment extends Fragment {
         v.setBackgroundColor(Color.WHITE);
         listView = v.findViewById(R.id.contact_list_view);
         contacts = Constants.users;
-
-
-        editsearch = getActivity().findViewById(R.id.search);
-
+        editSearch = getActivity().findViewById(R.id.search);
 
         if (contacts != null) {
             updateUI(contacts);
             numberOfContacts = contacts.size();
-            editsearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            editSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     query = query.toLowerCase(Locale.getDefault());
@@ -69,11 +54,13 @@ public class ContactsListFragment extends Fragment {
                             try {
                                 users.add(user);
                                 Log.w("Users",user.getContactName());
-                            }catch (NullPointerException ex){}
+                            }catch (NullPointerException ex){
+                                ex.printStackTrace();
+                            }
                         }
                     }
                     Log.w("Users",contacts.toString());
-                    if (users != null) updateUI(users);
+                    updateUI(users);
                     return false;
                 }
 
@@ -88,11 +75,13 @@ public class ContactsListFragment extends Fragment {
                             try {
                                 users.add(user);
                                 Log.w("Users",user.getContactName());
-                            }catch (NullPointerException ex){}
+                            }catch (NullPointerException ex){
+                                ex.printStackTrace();
+                            }
                         }
                     }
                     Log.w("Users",contacts.toString());
-                    if (users != null) updateUI(users);
+                    updateUI(users);
                     return false;
                 }
             });
@@ -115,8 +104,7 @@ public class ContactsListFragment extends Fragment {
         return v;
     }
 
-    private void sendData(String name, String number)
-    {
+    private void sendData(String name, String number) {
         //INTENT OBJ
         Intent i = new Intent(getActivity().getBaseContext(), HomeActivity.class);
 

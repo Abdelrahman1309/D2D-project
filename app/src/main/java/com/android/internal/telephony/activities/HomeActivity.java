@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.fragments.ContactsListFragment;
+import com.android.internal.telephony.fragments.LogsListFragment;
 import com.android.internal.telephony.utils.Constants;
 
 //Todo (1) Receive New wifi networks
@@ -99,6 +100,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 transaction.addToBackStack(null);
                 transaction.commit();
                 break;
+            case R.id.recents :
+                transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_logs,new LogsListFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
         }
 
 

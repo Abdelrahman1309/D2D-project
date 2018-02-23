@@ -1,6 +1,5 @@
 package com.android.internal.telephony.contacts;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -8,17 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import com.android.internal.telephony.R;
-import com.android.internal.telephony.activities.HomeActivity;
-import com.android.internal.telephony.fragments.ContactsListFragment;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-
-public class ContactsAdapter<C> extends ArrayAdapter<Contacts> {
+public class ContactsAdapter extends ArrayAdapter<Contacts> {
     private List<Contacts> contactsList = null;
     private ArrayList<Contacts> contacts;
     public ContactsAdapter (Context context, ArrayList<Contacts> contact){

@@ -3,6 +3,7 @@ package com.android.internal.telephony.utils;
 import android.support.v4.util.Pair;
 
 import com.android.internal.telephony.contacts.Contacts;
+import com.android.internal.telephony.contacts.Logs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ public final class Constants {
     }
 
     public static ArrayList<Contacts> users = null;
+    public static ArrayList<Logs> logs = null;
 
     public static final String NETWORK_PASSWORD = "123456789";
 
