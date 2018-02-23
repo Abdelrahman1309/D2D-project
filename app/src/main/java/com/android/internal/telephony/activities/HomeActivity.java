@@ -13,13 +13,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.internal.telephony.R;
+import com.android.internal.telephony.contacts.AvailableContacts;
+import com.android.internal.telephony.contacts.AvailableContactsAdapter;
+import com.android.internal.telephony.contacts.Logs;
+import com.android.internal.telephony.contacts.LogsAdapter;
 import com.android.internal.telephony.fragments.ContactsListFragment;
 import com.android.internal.telephony.fragments.LogsListFragment;
 import com.android.internal.telephony.utils.Constants;
+
+import java.util.ArrayList;
 
 //Todo (1) Receive New wifi networks
 //Todo (2) Send Phone Call Intent to CallActivity
@@ -40,7 +47,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home);
         identifyNumbers();
         searchBar.setVisibility(View.VISIBLE);
-
+        ListView listView = findViewById(R.id.available_contacts);
+        ArrayList<AvailableContacts> availableContacts= new ArrayList<>();
+        availableContacts.add(new AvailableContacts("Abdelrahman"));
+        availableContacts.add(new AvailableContacts("Hashem"));
+        availableContacts.add(new AvailableContacts("Kholy"));
+        availableContacts.add(new AvailableContacts("Sika"));
+        availableContacts.add(new AvailableContacts("Tal3at"));
+        listView.setAdapter(new AvailableContactsAdapter(this,availableContacts));
 
     }
 
@@ -51,7 +65,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             String name = i.getStringExtra("name");
             String number = i.getStringExtra("number");
             mPhone.setText(number);
-            mName.setText(name);
+            //mName.setText(name);
             searchBar.setVisibility(View.VISIBLE);
 
     }
@@ -125,7 +139,7 @@ private void identifyNumbers(){
     hash = findViewById(R.id.hash);
     mCall= findViewById(R.id.call);
     mPhone=findViewById(R.id.phoneNum);
-    mName=findViewById(R.id.name);
+    //mName=findViewById(R.id.name);
     backSpace=findViewById(R.id.back_space);
     contact=findViewById(R.id.contact);
     recents=findViewById(R.id.recents);

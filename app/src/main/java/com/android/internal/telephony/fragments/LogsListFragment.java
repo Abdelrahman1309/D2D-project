@@ -30,7 +30,7 @@ public class LogsListFragment extends Fragment {
         listView = v.findViewById(R.id.logs_list_view);
         //logs = Constants.logs;
         logs.add(new Logs("Abdelrahman",R.drawable.forward_call,"D2D","10:43 am"));
-        logs.add(new Logs("Hashem",R.drawable.cancel_call,"VOIP","10:43 am "));
+        logs.add(new Logs("Hashem",R.drawable.cancel_call,"VOIP","10:43 am"));
         logs.add(new Logs("Kholy",R.drawable.forward_call,"D2D","11:43 am"));
         logs.add(new Logs("Tal3at",R.drawable.income_call,"VOIP","10:00 pm"));
         logs.add(new Logs("Sika",R.drawable.missed_call,"D2D","07:30 pm"));
