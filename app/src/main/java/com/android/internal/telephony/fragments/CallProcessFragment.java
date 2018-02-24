@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.contacts.Contacts;
+import com.android.internal.telephony.contacts.Logs;
 import com.android.internal.telephony.utils.Constants;
 
 import java.util.ArrayList;

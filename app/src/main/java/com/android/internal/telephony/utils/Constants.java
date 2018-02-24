@@ -77,13 +77,13 @@ public final class Constants {
     }
 
     public static ArrayList<Contacts> users = null;
-    public static ArrayList<Logs> logs = null;
 
     public static final String NETWORK_PASSWORD = "123456789";
 
 
     private static Map<String,String> mPhonesMap = new HashMap<>();
     private static List<String> mAvailableDevices = new ArrayList<>();
+    private static ArrayList<Logs> mLogs = new ArrayList<>();
     private static String mDeviceIP;
     private static String mPhoneNumber;
     //private static String mOtherPhoneNumber;
@@ -149,9 +149,22 @@ public final class Constants {
             mAvailableDevices.add(number);
         }
     }
+    public static void addLogs(Logs contact){
+        mLogs.add(contact);
+    }
+    public static ArrayList<Logs> getLogs(){
+        return mLogs;
+    }
+    public static void deleteLogs(){
+        mLogs.clear();
+    }
+
 
     public static String getNearbyDevice(int index) {
         return mAvailableDevices.get(index);
+    }
+    public static int getNumberOfNearbyDevice() {
+        return mAvailableDevices.size();
     }
 
     public static Pair<String,String> getPhoneNumber(String phoneNum){

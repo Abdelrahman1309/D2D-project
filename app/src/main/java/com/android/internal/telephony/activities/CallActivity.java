@@ -10,6 +10,9 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.android.internal.telephony.R;
+import com.android.internal.telephony.contacts.AvailableContacts;
+import com.android.internal.telephony.contacts.Contacts;
+import com.android.internal.telephony.contacts.Logs;
 import com.android.internal.telephony.fragments.CallProcessFragment;
 import com.android.internal.telephony.fragments.IncomeCallFragment;
 import com.android.internal.telephony.services.CallService;
@@ -17,6 +20,10 @@ import com.android.internal.telephony.utils.Constants;
 
 import org.abtollc.sdk.AbtoApplication;
 import org.abtollc.sdk.AbtoPhone;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 //Todo (1) regarding to received intent display (Income call or outcome call)
 //Todo (2) Interact with call service
@@ -109,12 +116,16 @@ public class CallActivity extends FragmentActivity {
                 intent.setAction(Constants.Calling.CALL_SERVICE_ACTION);
                 intent.putExtra("OUTGOING","OUTGOING");
                 sendBroadcast(intent);
+
+                addLogs(mDevicePhoneNumber,R.drawable.forward_call,"D2D");
+
                 // push Call process fragment
                 pushCallProcessFragment(mDevicePhoneNumber);
             }else if(mCallTech.equals("VOIP")){
                 AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
                 try {
                     abtoPhone.startCall(mDevicePhoneNumber,abtoPhone.getCurrentAccountId());
+                    addLogs(mDevicePhoneNumber,R.drawable.forward_call,"VOIP");
                     pushCallProcessFragment(mDevicePhoneNumber);
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -127,12 +138,15 @@ public class CallActivity extends FragmentActivity {
             if(mCallTech!= null && mIntent.getStringExtra("CALL_TECH").equals("D2D")){
                 mDeviceIP = mIntent.getStringExtra("PHONE_IP");
                 mIncomePhoneNumber = mIntent.getStringExtra("PHONE_NUM");
+                mIncomePhoneNumber = mIncomePhoneNumber.substring(0,11);
                 Log.i(TAG, String.format("Incoming Phone ip is: %s",mDeviceIP));
+
             }
             else if (mCallTech!= null && mIntent.getStringExtra("CALL_TECH").equals("VOIP")) {
                 mIncomePhoneNumber = mIntent.getStringExtra(AbtoPhone.REMOTE_CONTACT);
-                mIncomePhoneNumber = mIncomePhoneNumber.substring(1,12);
-                Log.i(TAG, String.format("Incoming Phone no is: %s",mIncomePhoneNumber));
+                mIncomePhoneNumber = mIncomePhoneNumber.substring(0,11);
+                Log.i(TAG, String.format("Incoming Phone no is:%s",mIncomePhoneNumber));
+
             }
             //Case incoming call p ush Call incoming call fragment
             pushIncomingCallFragment(mIncomePhoneNumber,mIntent.getStringExtra("CALL_TECH"));
@@ -152,10 +166,13 @@ public class CallActivity extends FragmentActivity {
             i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
             i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE,"_accept_");
             sendBroadcast(i);
+            addLogs(mIncomePhoneNumber,R.drawable.income_call,"D2D");
+
         }else if(mCallTech.equals("VOIP")){
             AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
             try {
                 abtoPhone.answerCall(200);
+                addLogs(mIncomePhoneNumber,R.drawable.income_call,"VOIP");
                 abtoPhone.setCallDisconnectedListener((s, i, i1) -> this.finish());
                 pushCallProcessFragment(mDevicePhoneNumber);
             } catch (RemoteException e) {
@@ -165,7 +182,6 @@ public class CallActivity extends FragmentActivity {
         }
 
     }
-
     public void endCall(){
         if(mCallTech.equals("D2D")){
             Log.i(TAG,"End call invoked");
@@ -194,7 +210,6 @@ public class CallActivity extends FragmentActivity {
         }
 
     }
-
     private void sendSignal(String signal){
         Intent i = new Intent();
         i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
@@ -213,13 +228,11 @@ public class CallActivity extends FragmentActivity {
                 .replace(R.id.fragsContainer,mCallFragment)
                 .commit();
     }
-
     private void pushCallProcessFragment(String phoneNumber) {
 
         if(mProcessCallFrag == null) mProcessCallFrag = new CallProcessFragment();
         mProcessCallFrag.setPhoneNumber(phoneNumber);
         mProcessCallFrag.setArguments(mIntent.getExtras());
-
         getSupportFragmentManager().beginTransaction().replace(R.id.fragsContainer,mProcessCallFrag).commit();
     }
 
@@ -229,6 +242,24 @@ public class CallActivity extends FragmentActivity {
         unregisterReceiver(mBroadcastReceiver);
     }
 
-    //Broadcast receiver implementation
+    private void addLogs(String phoneNumber, int iconResId, String CallTech){
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        String time = sdf.format(cal.getTime());
+        ArrayList<Contacts> contacts = Constants.users;
+        Log.w("phoneNo",phoneNumber);
+        String contactName = phoneNumber;
+        try {
+            for (int j = 0; j < contacts.size(); j++) {
+                Contacts user = contacts.get(j);
+                if (user.getContactNumber() != null && user.getContactNumber().equals(phoneNumber)) {
+                    contactName = user.getContactName();
+                }
+            }
+        }catch (NullPointerException ex){
+            ex.printStackTrace();
+        }
+        Constants.addLogs(new Logs(contactName,iconResId,CallTech,time));
+    }
 
 }

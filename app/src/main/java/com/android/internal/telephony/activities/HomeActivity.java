@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.contacts.AvailableContacts;
@@ -35,7 +36,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FragmentTransaction transaction;
     Button btn0,btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,star,hash,contact,recents;
     ImageView backSpace,mCall,refresh;
-    EditText mPhone;
+    TextView mPhone;
     SearchView search;
     FrameLayout searchBar;
     SharedPreferences prefs;
@@ -203,11 +204,19 @@ private void checkNumber(){
 }
 private ArrayList<AvailableContacts> availableContacts(){
     ArrayList<Contacts> contacts = Constants.users;
+    Contacts user;
     ArrayList<AvailableContacts> availableContacts = new ArrayList<>();
         try {
-            availableContacts.add(new AvailableContacts(Constants.getNearbyDevice(0)));
-            availableContacts.add(new AvailableContacts(Constants.getNearbyDevice(1)));
-            availableContacts.add(new AvailableContacts(Constants.getNearbyDevice(2)));
+            for (int i = 0; i < Constants.getNumberOfNearbyDevice() ; i++){
+                String nearbyDevice = Constants.getNearbyDevice(i);
+                for(int j = 0 ; j < contacts.size() ; j++){
+                    user = contacts.get(j);
+                    if (user.getContactNumber() != null && user.getContactNumber().equals(nearbyDevice)){
+                        availableContacts.add(new AvailableContacts(user.getContactName()));
+                    }
+                }
+
+            }
         }catch (NullPointerException ex){
             ex.printStackTrace();
         }
