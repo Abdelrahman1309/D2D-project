@@ -137,6 +137,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         }
     };
 
+
     private void openHomeActivity(){
         Intent i = new Intent(this,HomeActivity.class);
         startActivity(i);

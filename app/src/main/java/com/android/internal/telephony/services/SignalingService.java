@@ -143,6 +143,7 @@ public class SignalingService extends Service {
                             String[] msg = incomeMessage.split("##");
                                 if (!msg[2].equals(Constants.getDeviceIP())) {
                                     Constants.addNumber(msg[1].trim(), msg[2].trim());
+                                    Constants.addNearbyDevice(msg[1].trim());
                                     Log.i(mTag, String.format("New number added: %s", msg[1]));
                                 }
 

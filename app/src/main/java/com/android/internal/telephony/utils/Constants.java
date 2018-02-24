@@ -1,12 +1,14 @@
 package com.android.internal.telephony.utils;
 
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.Logs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class Constants {
@@ -81,7 +83,7 @@ public final class Constants {
 
 
     private static Map<String,String> mPhonesMap = new HashMap<>();
-
+    private static List<String> mAvailableDevices = new ArrayList<>();
     private static String mDeviceIP;
     private static String mPhoneNumber;
     //private static String mOtherPhoneNumber;
@@ -141,6 +143,15 @@ public final class Constants {
     public static void addNumber(String number, String ip){
 
         mPhonesMap.put(number,ip);
+    }
+    public static void addNearbyDevice(String number){
+        if (!mAvailableDevices.contains(number) && !number.equals(mPhoneNumber)) {
+            mAvailableDevices.add(number);
+        }
+    }
+
+    public static String getNearbyDevice(int index) {
+        return mAvailableDevices.get(index);
     }
 
     public static Pair<String,String> getPhoneNumber(String phoneNum){

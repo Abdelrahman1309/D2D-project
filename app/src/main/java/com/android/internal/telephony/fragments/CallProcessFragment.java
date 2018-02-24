@@ -55,17 +55,18 @@ public class CallProcessFragment extends Fragment {
 
         ArrayList<Contacts> contacts = Constants.users;
         displayNumber.setText(phoneNumber);
-        /*try {
+        try {
             for (Contacts d : contacts) {
                 if (d.getContactNumber() != null && d.getContactNumber().equals(phoneNumber)) {
                     displayName.setText(d.getContactName());
                 }
                 //something here
             }
-        }catch (NullPointerException ex){}*/
-        endCall.setOnClickListener(v1 -> {
-            endCall();
-        });
+        }catch (NullPointerException ex){
+            ex.printStackTrace();
+        }
+
+        endCall.setOnClickListener(v1 -> endCall());
 
         speaker.setOnClickListener(v1 -> {
             audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);

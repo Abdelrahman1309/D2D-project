@@ -46,7 +46,7 @@ public class AskPhoneNumber extends DialogFragment{
         mSaveBtn.setOnClickListener(v1 -> {
             checkNumber = mPhoneNumTxt.getText().toString();
 
-            if(checkNumber.length() == 11 && checkNumber.startsWith("011") ) {
+            if(checkNumber.length() == 11 && checkNumber.startsWith("01") ) {
                 onSaveBtnClicked();
             }
             else{

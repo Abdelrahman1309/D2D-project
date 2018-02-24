@@ -1,5 +1,6 @@
 package com.android.internal.telephony.activities;
 
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -15,18 +16,17 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.contacts.AvailableContacts;
 import com.android.internal.telephony.contacts.AvailableContactsAdapter;
-import com.android.internal.telephony.contacts.Logs;
-import com.android.internal.telephony.contacts.LogsAdapter;
+import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.fragments.ContactsListFragment;
 import com.android.internal.telephony.fragments.LogsListFragment;
 import com.android.internal.telephony.utils.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //Todo (1) Receive New wifi networks
 //Todo (2) Send Phone Call Intent to CallActivity
@@ -34,8 +34,8 @@ import java.util.ArrayList;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
     FragmentTransaction transaction;
     Button btn0,btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,star,hash,contact,recents;
-    ImageView backSpace,mCall;
-    EditText mPhone;TextView mName;
+    ImageView backSpace,mCall,refresh;
+    EditText mPhone;
     SearchView search;
     FrameLayout searchBar;
     SharedPreferences prefs;
@@ -47,14 +47,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home);
         identifyNumbers();
         searchBar.setVisibility(View.VISIBLE);
-        ListView listView = findViewById(R.id.available_contacts);
-        ArrayList<AvailableContacts> availableContacts= new ArrayList<>();
-        availableContacts.add(new AvailableContacts("Abdelrahman"));
-        availableContacts.add(new AvailableContacts("Hashem"));
-        availableContacts.add(new AvailableContacts("Kholy"));
-        availableContacts.add(new AvailableContacts("Sika"));
-        availableContacts.add(new AvailableContacts("Tal3at"));
-        listView.setAdapter(new AvailableContactsAdapter(this,availableContacts));
 
     }
 
@@ -70,11 +62,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        searchBar.setVisibility(View.VISIBLE);
-    }
 
     @Override
     public void onClick(View v) {
@@ -95,7 +82,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.back_space:
                 try {
                     mPhone.setText(mPhone.getText().toString().substring(0, mPhone.getText().toString().length() - 1));
-                    mName.setText("");
                 }catch (Exception ex){
 
                 }
@@ -119,6 +105,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 transaction.replace(R.id.fragment_logs,new LogsListFragment());
                 transaction.addToBackStack(null);
                 transaction.commit();
+            case R.id.refresh:
+                ListView listView = findViewById(R.id.available_contacts);
+                ArrayList<AvailableContacts> availableContacts= availableContacts();
+                listView.setAdapter(new AvailableContactsAdapter(getApplication(),availableContacts));
         }
 
 
@@ -139,7 +129,7 @@ private void identifyNumbers(){
     hash = findViewById(R.id.hash);
     mCall= findViewById(R.id.call);
     mPhone=findViewById(R.id.phoneNum);
-    //mName=findViewById(R.id.name);
+    refresh=findViewById(R.id.refresh);
     backSpace=findViewById(R.id.back_space);
     contact=findViewById(R.id.contact);
     recents=findViewById(R.id.recents);
@@ -164,6 +154,7 @@ private void identifyNumbers(){
     contact.setOnClickListener(this);
     recents.setOnClickListener(this);
     searchBar.setOnClickListener(this);
+    refresh.setOnClickListener(this);
 }
 private void makeCall(){
 
@@ -210,5 +201,19 @@ private void checkNumber(){
     else {Toast toast = Toast.makeText(getApplicationContext(),"Invalid number", Toast.LENGTH_SHORT);
         toast.show();}
 }
-
+private ArrayList<AvailableContacts> availableContacts(){
+    ArrayList<Contacts> contacts = Constants.users;
+    ArrayList<AvailableContacts> availableContacts = new ArrayList<>();
+        try {
+            availableContacts.add(new AvailableContacts(Constants.getNearbyDevice(0)));
+            availableContacts.add(new AvailableContacts(Constants.getNearbyDevice(1)));
+            availableContacts.add(new AvailableContacts(Constants.getNearbyDevice(2)));
+        }catch (NullPointerException ex){
+            ex.printStackTrace();
+        }
+        catch (IndexOutOfBoundsException ex){
+            ex.printStackTrace();
+        }
+        return availableContacts;
+    }
 }
