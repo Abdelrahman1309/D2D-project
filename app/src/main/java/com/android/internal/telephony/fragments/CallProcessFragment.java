@@ -1,10 +1,12 @@
 package com.android.internal.telephony.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +18,10 @@ import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.Logs;
 import com.android.internal.telephony.utils.Constants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -54,7 +59,7 @@ public class CallProcessFragment extends Fragment {
         audioManager.setMode(AudioManager.MODE_IN_CALL);
         audioManager.setSpeakerphoneOn(false);
 
-        ArrayList<Contacts> contacts = Constants.users;
+        ArrayList<Contacts> contacts = getContactsList("CONTACTS");
         displayNumber.setText(phoneNumber);
         try {
             for (Contacts d : contacts) {
@@ -100,5 +105,12 @@ public class CallProcessFragment extends Fragment {
         displayNumber.clearComposingText();
         isOddClicked = true;
         speaker.getDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY );
+    }
+    public ArrayList<Contacts> getContactsList(String key){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<Contacts>>() {}.getType();
+        return gson.fromJson(json, type);
     }
 }

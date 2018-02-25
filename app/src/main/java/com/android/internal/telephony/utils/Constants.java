@@ -1,11 +1,18 @@
 package com.android.internal.telephony.utils;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.Logs;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,14 +83,12 @@ public final class Constants {
 
     }
 
-    public static ArrayList<Contacts> users = null;
-
     public static final String NETWORK_PASSWORD = "123456789";
 
 
     private static Map<String,String> mPhonesMap = new HashMap<>();
     private static List<String> mAvailableDevices = new ArrayList<>();
-    private static ArrayList<Logs> mLogs = new ArrayList<>();
+
     private static String mDeviceIP;
     private static String mPhoneNumber;
     //private static String mOtherPhoneNumber;
@@ -129,7 +134,6 @@ public final class Constants {
         mDeviceIP = ip;
     }
 
-
     public static String getPhoneNumber() {
         return mPhoneNumber;
     }
@@ -139,34 +143,25 @@ public final class Constants {
     }
 
 
-
-    public static void addNumber(String number, String ip){
-
-        mPhonesMap.put(number,ip);
-    }
     public static void addNearbyDevice(String number){
         if (!mAvailableDevices.contains(number) && !number.equals(mPhoneNumber)) {
             mAvailableDevices.add(number);
         }
     }
-    public static void addLogs(Logs contact){
-        mLogs.add(contact);
-    }
-    public static ArrayList<Logs> getLogs(){
-        return mLogs;
-    }
-    public static void deleteLogs(){
-        mLogs.clear();
-    }
-
-
-    public static String getNearbyDevice(int index) {
-        return mAvailableDevices.get(index);
-    }
     public static int getNumberOfNearbyDevice() {
         return mAvailableDevices.size();
     }
+    public static String getNearbyDevice(int index) {
+        return mAvailableDevices.get(index);
+    }
+    public static void clearNearbyDevices(){
+        mAvailableDevices.clear();
+    }
 
+    public static void addNumber(String number, String ip){
+
+        mPhonesMap.put(number,ip);
+    }
     public static Pair<String,String> getPhoneNumber(String phoneNum){
         if(mPhonesMap.containsKey(phoneNum)){
             Pair<String,String> pair = new Pair<>(phoneNum,mPhonesMap.get(phoneNum));
@@ -174,4 +169,6 @@ public final class Constants {
         }
         return null;
     }
+
+
 }

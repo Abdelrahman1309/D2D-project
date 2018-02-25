@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -44,6 +45,7 @@ import com.android.internal.telephony.utils.Constants;
 import com.android.internal.telephony.utils.NetworkUtils;
 import com.android.internal.telephony.utils.PhoneUtils;
 import com.android.internal.telephony.views.AskPhoneNumber;
+import com.google.gson.Gson;
 
 import org.abtollc.sdk.AbtoApplication;
 import org.abtollc.sdk.AbtoPhone;
@@ -72,11 +74,16 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        requestBasicPermissions();
+        try {
+            requestBasicPermissions();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
         requestRecordAudioPermission();
         ContactsAsyncTask task = new ContactsAsyncTask();
-        task.execute("Contacts");
-
+        if(askPermissions()) {
+            task.execute("Contacts");
+        }
         String phoneNumber = PhoneUtils.getPhoneNumber(this);
         if(phoneNumber!= null) {
             phoneNumber = phoneNumber.replace(" ", "");
@@ -117,14 +124,22 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
 
         prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
         devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
-
-        if (devicePhoneNumber.length() == 11 && devicePhoneNumber.startsWith("01")){
-            final Handler handler = new Handler();
-            handler.postDelayed(() -> {
-                Constants.setPhoneNumber(devicePhoneNumber);
+        if (!askPermissions()) {
+            Thread thread = new Thread(() -> {
+                while (!askPermissions()) {}
+                task.execute("Contacts");
                 openHomeActivity();
-            }, 5000);
-
+            });
+            thread.start();
+        }
+        if(askPermissions()) {
+            if (devicePhoneNumber.length() == 11 && devicePhoneNumber.startsWith("01")) {
+                final Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    Constants.setPhoneNumber(devicePhoneNumber);
+                    openHomeActivity();
+                }, 3000);
+            }
         }
 
     }
@@ -157,15 +172,21 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 //String message = "You need to grant access to " + permissionsNeeded.get(0);
                 //for (int i = 1; i < permissionsNeeded.size(); i++) message = message + ", " + permissionsNeeded.get(i);
 
-
+                try {
+                    ActivityCompat.requestPermissions(this,
+                            permissionsList.toArray(new String[permissionsList.size()]),
+                            REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+            try {
                 ActivityCompat.requestPermissions(this,
                         permissionsList.toArray(new String[permissionsList.size()]),
                         REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
-
-            ActivityCompat.requestPermissions(this,
-                    permissionsList.toArray(new String[permissionsList.size()]),
-                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
         }
     }
 
@@ -181,6 +202,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         if (!addPermission(permissionsList, Manifest.permission.RECORD_AUDIO))           permissionsNeeded.add("Record audio");
         if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE)) permissionsNeeded.add("Write logs to sd card");
         if (!addPermission(permissionsList, Manifest.permission.USE_SIP))                permissionsNeeded.add("Use SIP protocol");
+        if (!addPermission(permissionsList, Manifest.permission.READ_CONTACTS))                permissionsNeeded.add("Read Contacts");
 
 
         if (permissionsList.size() > 0) {
@@ -189,11 +211,13 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 //String message = "You need to grant access to " + permissionsNeeded.get(0);
                 //for (int i = 1; i < permissionsNeeded.size(); i++) message = message + ", " + permissionsNeeded.get(i);
 
-
-                ActivityCompat.requestPermissions(this,
-                        permissionsList.toArray(new String[permissionsList.size()]),
-                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-
+                try {
+                    ActivityCompat.requestPermissions(this,
+                            permissionsList.toArray(new String[permissionsList.size()]),
+                            REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
                 return false;
             }
 
@@ -284,8 +308,12 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         config.setUseSRTP(false);
 
         // Start initializing - !has to be invoked only once, when  app started!
-        abtoPhone.initialize();
 
+        try {
+            abtoPhone.initialize();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
         Log.i("VOIP ","Done initialize");
     }
 
@@ -313,7 +341,11 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
                 break;
             case SUCCESS:
                 Log.i("VOIP__","Initialize success");
-                registerToServer();
+                try {
+                    registerToServer();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
                 break;
 
             default:
@@ -452,7 +484,17 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         protected void onPostExecute(ArrayList<Contacts> contacts) {
             super.onPostExecute(contacts);
             // If there is no result, do nothing.
-            if (contacts != null) Constants.users = contacts;
+            if (contacts != null) saveArrayList(contacts,"CONTACTS");
             else return;
         }
-    }}
+    }
+
+    public void saveArrayList(ArrayList<Contacts> list, String key){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();     // This line is IMPORTANT !!!
+    }
+}

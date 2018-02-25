@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
@@ -17,10 +19,13 @@ import com.android.internal.telephony.fragments.CallProcessFragment;
 import com.android.internal.telephony.fragments.IncomeCallFragment;
 import com.android.internal.telephony.services.CallService;
 import com.android.internal.telephony.utils.Constants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.abtollc.sdk.AbtoApplication;
 import org.abtollc.sdk.AbtoPhone;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,7 +49,7 @@ import java.util.Calendar;
 public class CallActivity extends FragmentActivity {
 
     private static String TAG;
-
+    private static ArrayList<Logs> mLogs = new ArrayList<>();
     //Fragments
     private IncomeCallFragment mCallFragment;
     private CallProcessFragment mProcessCallFrag;
@@ -71,6 +76,10 @@ public class CallActivity extends FragmentActivity {
                     Log.e(TAG,"There are an error in CallActivity. ",ex);
                 }
             }else if(intent.getAction()!= null && intent.getAction().equals("CALL_ENDED")) {
+                Intent i = new Intent();
+                i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
+                i.putExtra("END","END");
+                sendBroadcast(i);
                 CallActivity.this.finish();
             }
         }
@@ -240,13 +249,15 @@ public class CallActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mBroadcastReceiver);
+        saveLogsList(mLogs,"LOGS");
+
     }
 
     private void addLogs(String phoneNumber, int iconResId, String CallTech){
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         String time = sdf.format(cal.getTime());
-        ArrayList<Contacts> contacts = Constants.users;
+        ArrayList<Contacts> contacts = getContactsList("CONTACTS");
         Log.w("phoneNo",phoneNumber);
         String contactName = phoneNumber;
         try {
@@ -259,7 +270,28 @@ public class CallActivity extends FragmentActivity {
         }catch (NullPointerException ex){
             ex.printStackTrace();
         }
-        Constants.addLogs(new Logs(contactName,iconResId,CallTech,time));
+        addLogs(new Logs(contactName,iconResId,CallTech,time));
     }
 
+    public ArrayList<Contacts> getContactsList(String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<Contacts>>() {
+        }.getType();
+        return gson.fromJson(json, type);
+    }
+
+    public static void addLogs(Logs contact){
+        mLogs.add(contact);
+    }
+
+    public void saveLogsList(ArrayList<Logs> list, String key){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();     // This line is IMPORTANT !!!
+    }
 }

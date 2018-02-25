@@ -2,8 +2,10 @@ package com.android.internal.telephony.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +19,10 @@ import com.android.internal.telephony.activities.HomeActivity;
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.ContactsAdapter;
 import com.android.internal.telephony.utils.Constants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,7 +42,7 @@ public class ContactsListFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_contact_list, container, false);
         v.setBackgroundColor(Color.WHITE);
         listView = v.findViewById(R.id.contact_list_view);
-        contacts = Constants.users;
+        contacts = getContactsList("CONTACTS");
         editSearch = getActivity().findViewById(R.id.search);
 
         if (contacts != null) {
@@ -47,7 +53,7 @@ public class ContactsListFragment extends Fragment {
                 public boolean onQueryTextSubmit(String query) {
                     query = query.toLowerCase(Locale.getDefault());
                     ArrayList<Contacts> users= new ArrayList<>();
-                    contacts = Constants.users;
+                    contacts = getContactsList("CONTACTS");
                     for (int i = 0 ; i < numberOfContacts ; i++){
                         Contacts user = contacts.get(i);
                         if (user.getContactName().toLowerCase(Locale.getDefault()).contains(query)){
@@ -68,7 +74,7 @@ public class ContactsListFragment extends Fragment {
                 public boolean onQueryTextChange(String newText) {
                     newText = newText.toLowerCase(Locale.getDefault());
                     ArrayList<Contacts> users= new ArrayList<>();
-                    contacts = Constants.users;
+                    contacts = getContactsList("CONTACTS");
                     for (int i = 0 ; i < numberOfContacts ; i++){
                         Contacts user = contacts.get(i);
                         if (user.getContactName().toLowerCase(Locale.getDefault()).contains(newText)){
@@ -87,9 +93,8 @@ public class ContactsListFragment extends Fragment {
             });
 
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                String user = contacts.get(position).getContactName();
                 String num = contacts.get(position).getContactNumber();
-                sendData(user,num);
+                sendData(num);
             });
         }
         else {
@@ -104,12 +109,11 @@ public class ContactsListFragment extends Fragment {
         return v;
     }
 
-    private void sendData(String name, String number) {
+    private void sendData(String number) {
         //INTENT OBJ
         Intent i = new Intent(getActivity().getBaseContext(), HomeActivity.class);
 
         //PACK DATA
-        i.putExtra("name", name);
         i.putExtra("number", number);
 
         //START ACTIVITY
@@ -118,10 +122,15 @@ public class ContactsListFragment extends Fragment {
     private  void updateUI (ArrayList<Contacts> contact){
         listView.setAdapter(new ContactsAdapter(getActivity(), contact));
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            String user = contact.get(position).getContactName();
             String num = contact.get(position).getContactNumber();
-            sendData(user,num);
+            sendData(num);
         });
     }
-
+    public ArrayList<Contacts> getContactsList(String key){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<Contacts>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
 }
