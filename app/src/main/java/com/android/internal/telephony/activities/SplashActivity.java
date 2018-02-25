@@ -126,7 +126,7 @@ public class SplashActivity extends AppCompatActivity  implements OnInitializeLi
         devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
         if (!askPermissions()) {
             Thread thread = new Thread(() -> {
-                while (!askPermissions()) {}
+                while (!askPermissions() || !devicePhoneNumber.startsWith("01")) {}
                 task.execute("Contacts");
                 openHomeActivity();
             });
