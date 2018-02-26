@@ -8,26 +8,27 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.android.internal.telephony.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class LogsAdapter extends ArrayAdapter<Logs> {
     private List<Logs> logsList = null;
     private ArrayList<Logs> logs;
-    public LogsAdapter (Context context, ArrayList<Logs> contact){
-        super(context,0,contact);
+
+    public LogsAdapter(Context context, ArrayList<Logs> contact) {
+        super(context, 0, contact);
         logs = contact;
         logsList = contact;
     }
+
     @Override
     public View getView(int position, @Nullable View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if (listItemView == null){
-            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.log_item,parent,false);
+        if (listItemView == null) {
+            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.log_item, parent, false);
         }
         Logs currentLog = getItem(position);
 

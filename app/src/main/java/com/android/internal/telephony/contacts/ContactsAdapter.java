@@ -7,23 +7,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
 import com.android.internal.telephony.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactsAdapter extends ArrayAdapter<Contacts> {
     private List<Contacts> contactsList = null;
     private ArrayList<Contacts> contacts;
-    public ContactsAdapter (Context context, ArrayList<Contacts> contact){
-        super(context,0,contact);
+
+    public ContactsAdapter(Context context, ArrayList<Contacts> contact) {
+        super(context, 0, contact);
         contacts = contact;
         contactsList = contact;
     }
+
     @Override
     public View getView(int position, @Nullable View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if (listItemView == null){
-            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.contact_item,parent,false);
+        if (listItemView == null) {
+            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.contact_item, parent, false);
         }
         Contacts currentContact = getItem(position);
 

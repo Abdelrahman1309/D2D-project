@@ -16,6 +16,7 @@ public class IncomingVIOPCallService extends Service implements OnIncomingCallLi
     private AbtoPhone abtoPhone;
 
     private String mTag;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -26,7 +27,7 @@ public class IncomingVIOPCallService extends Service implements OnIncomingCallLi
 
         mTag = this.getClass().getSimpleName();
 
-        Log.i(mTag,"IncomingVIOPCallService started");
+        Log.i(mTag, "IncomingVIOPCallService started");
         abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
 
         abtoPhone.setIncomingCallListener(this);
@@ -36,10 +37,10 @@ public class IncomingVIOPCallService extends Service implements OnIncomingCallLi
 
     @Override
     public void OnIncomingCall(String remoteContact, long arg1) {
-        Log.i(mTag,String.format("There are income call from voip server number is: %s",remoteContact));
+        Log.i(mTag, String.format("There are income call from voip server number is: %s", remoteContact));
         Intent intent = new Intent(this, CallActivity.class);
-        intent.putExtra("CALL_TYPE","INCOMING");
-        intent.putExtra("CALL_TECH","VOIP");
+        intent.putExtra("CALL_TYPE", "INCOMING");
+        intent.putExtra("CALL_TECH", "VOIP");
         intent.putExtra("CALL_ID", abtoPhone.getActiveCallId());
         intent.putExtra(AbtoPhone.REMOTE_CONTACT, remoteContact);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

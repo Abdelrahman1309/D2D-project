@@ -4,14 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.WindowManager;
-
-import com.android.internal.telephony.R;
-import com.android.internal.telephony.views.AskPhoneNumber;
 
 
 /**
@@ -31,12 +25,12 @@ public class PhoneUtils {
      * @param activity Activity needs phone number
      * @return phone number string
      */
-    public static String getPhoneNumber(Activity activity){
+    public static String getPhoneNumber(Activity activity) {
         //String phoneNum = getCashedPhoneNumber(activity);
 
         try {
             String phoneNum = getPhoneNumberFromSim(activity);
-            if(phoneNum != null && !phoneNum.isEmpty()) {
+            if (phoneNum != null && !phoneNum.isEmpty()) {
                 return phoneNum;
             }
             phoneNum = getPhoneNumberFromContacts(activity);
@@ -45,20 +39,20 @@ public class PhoneUtils {
                 return phoneNum;
             }
             phoneNum = getCashedPhoneNumber(activity);
-            if(!phoneNum.equals("")) {
+            if (!phoneNum.equals("")) {
                 return phoneNum;
             }
-        }catch (Exception ex){
-            Log.i("Get phone number","Failed");
+        } catch (Exception ex) {
+            Log.i("Get phone number", "Failed");
         }
         return null;
     }
 
-    private static String getCashedPhoneNumber(Activity activity){
-        return activity.getSharedPreferences(Constants.SharedPref.SHARED_PREF,Context.MODE_PRIVATE).getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"");
+    private static String getCashedPhoneNumber(Activity activity) {
+        return activity.getSharedPreferences(Constants.SharedPref.SHARED_PREF, Context.MODE_PRIVATE).getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM, "");
     }
 
-    private static String getPhoneNumberFromContacts(Activity activity){
+    private static String getPhoneNumberFromContacts(Activity activity) {
         String s1 = "";
         String main_data[] = {"data1", "is_primary", "data3", "data2", "data1", "is_primary", "photo_uri", "mimetype"};
         Object object = activity.getContentResolver().query(Uri.withAppendedPath(android.provider.ContactsContract.Profile.CONTENT_URI, "data"),
@@ -78,11 +72,10 @@ public class PhoneUtils {
 
     }
 
-    private static String getPhoneNumberFromSim(Activity activity){
+    private static String getPhoneNumberFromSim(Activity activity) {
         TelephonyManager tMgr = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
         return tMgr.getLine1Number();
     }
-
 
 
 }

@@ -6,19 +6,19 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.support.v4.app.Fragment;
 import android.widget.SearchView;
+
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.HomeActivity;
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.ContactsAdapter;
-import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -32,7 +32,8 @@ public class ContactsListFragment extends Fragment {
     ListView listView;
     ArrayList<Contacts> contacts;
     int numberOfContacts;
-    public ContactsListFragment(){
+
+    public ContactsListFragment() {
         // Required empty public constructor
     }
 
@@ -52,20 +53,20 @@ public class ContactsListFragment extends Fragment {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     query = query.toLowerCase(Locale.getDefault());
-                    ArrayList<Contacts> users= new ArrayList<>();
+                    ArrayList<Contacts> users = new ArrayList<>();
                     contacts = getContactsList("CONTACTS");
-                    for (int i = 0 ; i < numberOfContacts ; i++){
+                    for (int i = 0; i < numberOfContacts; i++) {
                         Contacts user = contacts.get(i);
-                        if (user.getContactName().toLowerCase(Locale.getDefault()).contains(query)){
+                        if (user.getContactName().toLowerCase(Locale.getDefault()).contains(query)) {
                             try {
                                 users.add(user);
-                                Log.w("Users",user.getContactName());
-                            }catch (NullPointerException ex){
+                                Log.w("Users", user.getContactName());
+                            } catch (NullPointerException ex) {
                                 ex.printStackTrace();
                             }
                         }
                     }
-                    Log.w("Users",contacts.toString());
+                    Log.w("Users", contacts.toString());
                     updateUI(users);
                     return false;
                 }
@@ -73,20 +74,20 @@ public class ContactsListFragment extends Fragment {
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     newText = newText.toLowerCase(Locale.getDefault());
-                    ArrayList<Contacts> users= new ArrayList<>();
+                    ArrayList<Contacts> users = new ArrayList<>();
                     contacts = getContactsList("CONTACTS");
-                    for (int i = 0 ; i < numberOfContacts ; i++){
+                    for (int i = 0; i < numberOfContacts; i++) {
                         Contacts user = contacts.get(i);
-                        if (user.getContactName().toLowerCase(Locale.getDefault()).contains(newText)){
+                        if (user.getContactName().toLowerCase(Locale.getDefault()).contains(newText)) {
                             try {
                                 users.add(user);
-                                Log.w("Users",user.getContactName());
-                            }catch (NullPointerException ex){
+                                Log.w("Users", user.getContactName());
+                            } catch (NullPointerException ex) {
                                 ex.printStackTrace();
                             }
                         }
                     }
-                    Log.w("Users",contacts.toString());
+                    Log.w("Users", contacts.toString());
                     updateUI(users);
                     return false;
                 }
@@ -96,12 +97,12 @@ public class ContactsListFragment extends Fragment {
                 String num = contacts.get(position).getContactNumber();
                 sendData(num);
             });
-        }
-        else {
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle("Contacts Permission");
             builder.setMessage("Please enable Contacts permission to read contacts");
-            builder.setPositiveButton("OK", (dialogInterface, i) -> {});
+            builder.setPositiveButton("OK", (dialogInterface, i) -> {
+            });
             Dialog alertDialog = builder.create();
             alertDialog.show();
         }
@@ -119,18 +120,21 @@ public class ContactsListFragment extends Fragment {
         //START ACTIVITY
         getActivity().startActivity(i);
     }
-    private  void updateUI (ArrayList<Contacts> contact){
+
+    private void updateUI(ArrayList<Contacts> contact) {
         listView.setAdapter(new ContactsAdapter(getActivity(), contact));
         listView.setOnItemClickListener((parent, view, position, id) -> {
             String num = contact.get(position).getContactNumber();
             sendData(num);
         });
     }
-    public ArrayList<Contacts> getContactsList(String key){
+
+    public ArrayList<Contacts> getContactsList(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Contacts>>() {}.getType();
+        Type type = new TypeToken<ArrayList<Contacts>>() {
+        }.getType();
         return gson.fromJson(json, type);
     }
 }

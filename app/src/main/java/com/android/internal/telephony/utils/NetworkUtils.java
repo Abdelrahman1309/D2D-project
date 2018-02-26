@@ -11,19 +11,15 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.List;
 
-/**
- * Created by Eslam on 12/27/2017.
- */
-
 public class NetworkUtils {
     public static String getWifiApIpAddress() {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
-                    .hasMoreElements();) {
+                    .hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
                 if (intf.getName().contains("wlan")) {
                     for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr
-                            .hasMoreElements();) {
+                            .hasMoreElements(); ) {
                         InetAddress inetAddress = enumIpAddr.nextElement();
                         if (!inetAddress.isLoopbackAddress()
                                 && (inetAddress.getAddress().length == 4)) {
@@ -39,28 +35,30 @@ public class NetworkUtils {
         return null;
     }
 
-    public static void turnOnWifi(Context context){
-        WifiManager wifiManager = (WifiManager)context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(!wifiManager.isWifiEnabled())
+    public static void turnOnWifi(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
     }
-    public static void turnOffWifi(Context context){
-        WifiManager wifiManager = (WifiManager)context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifiManager.isWifiEnabled())
+
+    public static void turnOffWifi(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(false);
     }
 
-    public static int getWifiSignalLevel(Context context){
-        WifiManager wifiManager = (WifiManager)context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+    public static int getWifiSignalLevel(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         int rssi = wifiManager.getConnectionInfo().getRssi();
-        return WifiManager.calculateSignalLevel(rssi,5);
+        return WifiManager.calculateSignalLevel(rssi, 5);
     }
-    public static boolean getWifiState(Context context){
-        WifiManager wifiManager = (WifiManager)context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+    public static boolean getWifiState(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         return wifiManager.isWifiEnabled();
     }
 
-    public static void addNetwork(Context context,String ssid){
+    public static void addNetwork(Context context, String ssid) {
         WifiConfiguration conf = new WifiConfiguration();
         conf.SSID = "\"" + ssid + "\"";
         //For WEP
@@ -69,15 +67,15 @@ public class NetworkUtils {
         conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
         conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);*/
         //For WPA
-        conf.preSharedKey = "\""+ Constants.NETWORK_PASSWORD +"\"";
+        conf.preSharedKey = "\"" + Constants.NETWORK_PASSWORD + "\"";
 
         conf.priority = 1;
-        WifiManager wifiManager = (WifiManager)context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.addNetwork(conf);
 
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-        for( WifiConfiguration i : list ) {
-            if(i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
                 wifiManager.disconnect();
                 wifiManager.enableNetwork(i.networkId, true);
                 wifiManager.reconnect();

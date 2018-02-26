@@ -21,12 +21,12 @@ public class CellularCallReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
-        Log.i(Constants.TAG,"OnReceive CellularCallReceiver");
+        Log.i(Constants.TAG, "OnReceive CellularCallReceiver");
         String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
         String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
 
-        if(stateStr != null && number != null) {
+        if (stateStr != null && number != null) {
             if (stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                 Log.i(Constants.TAG, "Phone is Idle");
             } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {

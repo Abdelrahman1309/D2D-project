@@ -63,6 +63,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         searchBar.setVisibility(View.VISIBLE);
 
     }
+
     @Override
     protected void onPause() {
         Constants.clearNearbyDevices();

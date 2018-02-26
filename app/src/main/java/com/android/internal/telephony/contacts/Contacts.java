@@ -5,13 +5,16 @@ public class Contacts {
     private String mName;
     private String mNumber;
 
-    public Contacts (String name, String number){
+    public Contacts(String name, String number) {
         mName = name;
         mNumber = number;
     }
 
-    public String getContactName(){
+    public String getContactName() {
         return mName;
     }
-    public String getContactNumber(){return mNumber;}
+
+    public String getContactNumber() {
+        return mNumber;
+    }
 }

@@ -1,6 +1,5 @@
 package com.android.internal.telephony.services;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,6 +36,7 @@ import io.reactivex.schedulers.Schedulers;
 //Todo (6) send phone number broadcast - done
 
 //Todo close service
+
 /**
  * This call responsible for signaling server
  * (1) open server when start server
@@ -55,14 +55,14 @@ public class SignalingService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String msg = intent.getStringExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE);
-            Log.i(mTag,String.format("There are new broadcast its message is: %s",msg));
+            Log.i(mTag, String.format("There are new broadcast its message is: %s", msg));
             try {
                 if (intent.getStringExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS) != null) {
                     sendNetworkMessage(intent.getStringExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS), msg);
-                } else if(Constants.getDeviceIP() != null) {
-                        String networkIP = Constants.getDeviceIP().substring(0, Constants.getDeviceIP().lastIndexOf("."));
-                        networkIP += ".255";
-                        sendNetworkMessage(networkIP, msg);
+                } else if (Constants.getDeviceIP() != null) {
+                    String networkIP = Constants.getDeviceIP().substring(0, Constants.getDeviceIP().lastIndexOf("."));
+                    networkIP += ".255";
+                    sendNetworkMessage(networkIP, msg);
 
                 }
             } catch (IOException e) {
@@ -76,10 +76,10 @@ public class SignalingService extends Service {
     public void onCreate() {
         super.onCreate();
         mTag = this.getClass().getSimpleName();
-        Log.i(mTag,"Signaling Service Started");
+        Log.i(mTag, "Signaling Service Started");
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
-        registerReceiver(receiver,filter);
+        registerReceiver(receiver, filter);
         createBroadCastTimer();
     }
 
@@ -119,10 +119,10 @@ public class SignalingService extends Service {
                     @Override
                     public void onNext(String incomeMessage) {
                         //Here we must send app broadcast with specific action like Constants.Signaling.CALL_INVITATION_SIGNAL_PARAM to notify any app component with the new request
-                        Log.i(mTag,"New network message: " + incomeMessage.substring(0,40));
+                        Log.i(mTag, "New network message: " + incomeMessage.substring(0, 40));
 
                         String action;
-                        if(incomeMessage.startsWith("_invite_")) {
+                        if (incomeMessage.startsWith("_invite_")) {
                             //Incoming call -> open incoming call activity,
                             //send broadcast to other app components with USER_REGISTER_REQUEST_SIGNAL_PARAM action
 
@@ -136,38 +136,39 @@ public class SignalingService extends Service {
                             startActivity(openCallActivity);
                             action = Constants.Signaling.CALL_INVITATION_SIGNAL_PARAM;
 
-                        }else if(incomeMessage.startsWith(Constants.Signaling.USER_REGISTER_REQUEST_SIGNAL_PARAM ) ) {
+                        } else if (incomeMessage.startsWith(Constants.Signaling.USER_REGISTER_REQUEST_SIGNAL_PARAM)) {
                             //Registration request -> send broadcast to other app components with USER_REGISTER_REQUEST_SIGNAL_PARAM action
                             action = Constants.Signaling.USER_REGISTER_REQUEST_SIGNAL_PARAM;
                             //Add user number to current users in cell
                             String[] msg = incomeMessage.split("##");
-                                if (!msg[2].equals(Constants.getDeviceIP())) {
-                                    Constants.addNumber(msg[1].trim(), msg[2].trim());
-                                    prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
-                                    devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
-                                    if (!devicePhoneNumber.equals(msg[1].trim())) Constants.addNearbyDevice(msg[1].trim());
-                                    Log.i(mTag, String.format("New number added: %s", msg[1]));
-                                }
+                            if (!msg[2].equals(Constants.getDeviceIP())) {
+                                Constants.addNumber(msg[1].trim(), msg[2].trim());
+                                prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
+                                devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM, "SHARED_PREF_PHONE_NUM");
+                                if (!devicePhoneNumber.equals(msg[1].trim()))
+                                    Constants.addNearbyDevice(msg[1].trim());
+                                Log.i(mTag, String.format("New number added: %s", msg[1]));
+                            }
 
 
-                        }else if(incomeMessage.startsWith(Constants.Signaling.END_CALL_SIGNAL_PARAM)){
+                        } else if (incomeMessage.startsWith(Constants.Signaling.END_CALL_SIGNAL_PARAM)) {
                             //Todo Implement end call callback
                             //End call-> send broadcast to other app components with END_CALL_SIGNAL_PARAM action
                             action = Constants.Signaling.END_CALL_SIGNAL_PARAM;
-                        }else if(incomeMessage.startsWith("_accept_")){
+                        } else if (incomeMessage.startsWith("_accept_")) {
                             Intent i = new Intent();
                             i.setAction("CALL_ACCEPTED");
                             sendBroadcast(i);
                             return;
-                        }else if(incomeMessage.startsWith("_end_")){
+                        } else if (incomeMessage.startsWith("_end_")) {
                             Intent i = new Intent();
                             i.setAction("CALL_ENDED");
                             sendBroadcast(i);
                             return;
-                        }else{
+                        } else {
                             return;
                         }
-                        sendAppBroadcast(action,incomeMessage);//Send application broadcast with the number
+                        sendAppBroadcast(action, incomeMessage);//Send application broadcast with the number
                     }
 
                     @Override
@@ -189,24 +190,24 @@ public class SignalingService extends Service {
         return null;
     }
 
-    void createBroadCastTimer(){
+    void createBroadCastTimer() {
         Observable<Long> broadcastTimeObservable = Observable.interval(2, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
         broadcastTimeObservable.subscribe(new Observer<Object>() {
             @Override
             public void onSubscribe(Disposable d) {
-                Log.i(mTag,"Network broadcast timer started");
+                Log.i(mTag, "Network broadcast timer started");
                 mDisposable.add(d);
             }
 
             @Override
             public void onNext(Object o) {
                 String ip = Constants.getDeviceIP();
-                if(ip!= null) {
+                if (ip != null) {
                     String networkIP = ip.substring(0, ip.lastIndexOf("."));
                     networkIP += ".255";
                     Log.i(mTag, "New Broadcast to networkIP: " + networkIP);
                     prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
-                    devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM,"SHARED_PREF_PHONE_NUM");
+                    devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM, "SHARED_PREF_PHONE_NUM");
                     String msg = "_register_##" + devicePhoneNumber + "##" + ip;
                     try {
                         sendNetworkMessage(networkIP, msg);
@@ -231,20 +232,20 @@ public class SignalingService extends Service {
     void sendNetworkMessage(String ip, String msg) throws IOException {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        Log.i(mTag,"Sending message to: "+ip);
+        Log.i(mTag, "Sending message to: " + ip);
         final InetAddress destination = InetAddress.getByName(ip);
         DatagramSocket clientSocket = new DatagramSocket();
         byte[] sendData = new byte[1024];
         sendData = msg.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket (sendData,sendData.length,destination,Constants.Signaling.SIGNALING_SERVER_PORT);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, destination, Constants.Signaling.SIGNALING_SERVER_PORT);
         clientSocket.send(sendPacket);
-        Log.i(mTag,"Message sent to recipient");
+        Log.i(mTag, "Message sent to recipient");
     }
 
-    private void sendAppBroadcast(String action, String msg){
+    private void sendAppBroadcast(String action, String msg) {
         Intent i = new Intent();
         i.setAction(action);
-        i.putExtra(Constants.Signaling.SIGNALING_MESSAGE,msg);
+        i.putExtra(Constants.Signaling.SIGNALING_MESSAGE, msg);
         sendBroadcast(i);
     }
 

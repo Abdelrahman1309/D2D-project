@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,10 +28,12 @@ public class IncomeCallFragment extends Fragment {
     public IncomeCallFragment() {
         // Required empty public constructor
     }
-    public void setPhoneNumber(String number){
+
+    public void setPhoneNumber(String number) {
         incomePhoneNumber = number;
     }
-    public void callTech(String tech){
+
+    public void callTech(String tech) {
         callTechnology = tech;
     }
 
@@ -46,7 +47,7 @@ public class IncomeCallFragment extends Fragment {
         displayIncomePhoneNum = v.findViewById(R.id.income_phone_num);
 
         displayIncomePhoneNum.setText(incomePhoneNumber);
-        if ( callTechnology.equals("D2D") ) {
+        if (callTechnology.equals("D2D")) {
             ringTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
             r = RingtoneManager.getRingtone(getContext(), ringTone);
             r.play();
@@ -57,7 +58,7 @@ public class IncomeCallFragment extends Fragment {
             displayIncomePhoneNum.clearComposingText();
             try {
                 r.stop();
-            }catch (NullPointerException ex){
+            } catch (NullPointerException ex) {
 
             }
         });
@@ -67,7 +68,7 @@ public class IncomeCallFragment extends Fragment {
             displayIncomePhoneNum.clearComposingText();
             try {
                 r.stop();
-            }catch (NullPointerException ex){
+            } catch (NullPointerException ex) {
 
             }
         });
@@ -76,14 +77,14 @@ public class IncomeCallFragment extends Fragment {
     }
 
 
-    private void onAnswerClicked(){
-        Log.i("Incomming Call","Answer Btn Clicked");
-        ((CallActivity)getActivity()).answerCall();
+    private void onAnswerClicked() {
+        Log.i("Incomming Call", "Answer Btn Clicked");
+        ((CallActivity) getActivity()).answerCall();
     }
 
-    private void onRejectClicked(){
-        Log.i("Incomming Call","Reject Btn Clicked");
-        ((CallActivity)getActivity()).endCall();
+    private void onRejectClicked() {
+        Log.i("Incomming Call", "Reject Btn Clicked");
+        ((CallActivity) getActivity()).endCall();
     }
 
     @Override
@@ -91,7 +92,7 @@ public class IncomeCallFragment extends Fragment {
         super.onDestroy();
         try {
             r.stop();
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
 
         }
     }

@@ -4,16 +4,16 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+
 import com.android.internal.telephony.R;
-import android.support.v4.app.Fragment;
 import com.android.internal.telephony.contacts.Logs;
 import com.android.internal.telephony.contacts.LogsAdapter;
-import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -26,7 +26,8 @@ public class LogsListFragment extends Fragment {
     ListView listView;
     ArrayList<Logs> logs = new ArrayList<>();
     ImageView trash;
-    public LogsListFragment(){
+
+    public LogsListFragment() {
         // Required empty public constructor
     }
 
@@ -39,29 +40,31 @@ public class LogsListFragment extends Fragment {
         logs = getLogsList("LOGS");
         try {
             Collections.reverse(logs);
-        }catch (NullPointerException ex){
+            listView.setAdapter(new LogsAdapter(getActivity(), logs));
+        } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
-        listView.setAdapter(new LogsAdapter(getActivity(),logs));
-
         trash = v.findViewById(R.id.trash);
         trash.setOnClickListener(v1 -> {
             ArrayList<Logs> clearLogs = new ArrayList<>();
-            saveLogsList(clearLogs,"LOGS");
+            saveLogsList(clearLogs, "LOGS");
             logs = getLogsList("LOGS");
-            listView.setAdapter(new LogsAdapter(getActivity(),logs));
+            listView.setAdapter(new LogsAdapter(getActivity(), logs));
         });
 
         return v;
     }
-    public ArrayList<Logs> getLogsList(String key){
+
+    public ArrayList<Logs> getLogsList(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Logs>>() {}.getType();
+        Type type = new TypeToken<ArrayList<Logs>>() {
+        }.getType();
         return gson.fromJson(json, type);
     }
-    public void saveLogsList(ArrayList<Logs> list, String key){
+
+    public void saveLogsList(ArrayList<Logs> list, String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = prefs.edit();
         Gson gson = new Gson();

@@ -13,11 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.contacts.Contacts;
-import com.android.internal.telephony.contacts.Logs;
-import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,11 +33,12 @@ public class CallProcessFragment extends Fragment {
     ImageView speaker;
     boolean isOddClicked = true;
     AudioManager audioManager;
+
     public CallProcessFragment() {
         // Required empty public constructor
     }
 
-    public void setPhoneNumber(String number){
+    public void setPhoneNumber(String number) {
         phoneNumber = number;
     }
 
@@ -48,12 +48,12 @@ public class CallProcessFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_call_process, container, false);
         ImageView endCall = v.findViewById(R.id.endCallFragBtn);
-        ImageView keypad  = v.findViewById(R.id.keypad);
-        ImageView mute    = v.findViewById(R.id.mute);
-        displayNumber     = v.findViewById(R.id.display_phone_num);
-        displayName       = v.findViewById(R.id.display_name);
+        ImageView keypad = v.findViewById(R.id.keypad);
+        ImageView mute = v.findViewById(R.id.mute);
+        displayNumber = v.findViewById(R.id.display_phone_num);
+        displayName = v.findViewById(R.id.display_name);
         speaker = v.findViewById(R.id.speaker);
-        TextView timer    = v.findViewById(R.id.timer);
+        TextView timer = v.findViewById(R.id.timer);
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(AudioManager.MODE_IN_CALL);
@@ -68,7 +68,7 @@ public class CallProcessFragment extends Fragment {
                 }
                 //something here
             }
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
 
@@ -78,13 +78,13 @@ public class CallProcessFragment extends Fragment {
             audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
             audioManager.setMode(AudioManager.MODE_IN_CALL);
 
-            if(isOddClicked) {
+            if (isOddClicked) {
                 audioManager.setSpeakerphoneOn(true);
-                speaker.getDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY );
+                speaker.getDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
                 isOddClicked = false;
-            } else{
+            } else {
                 audioManager.setSpeakerphoneOn(false);
-                speaker.getDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY );
+                speaker.getDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
                 isOddClicked = true;
             }
 
@@ -100,17 +100,19 @@ public class CallProcessFragment extends Fragment {
         return v;
     }
 
-    private  void endCall(){
-        ((CallActivity)getActivity()).endCall();
+    private void endCall() {
+        ((CallActivity) getActivity()).endCall();
         displayNumber.clearComposingText();
         isOddClicked = true;
-        speaker.getDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY );
+        speaker.getDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
     }
-    public ArrayList<Contacts> getContactsList(String key){
+
+    public ArrayList<Contacts> getContactsList(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Contacts>>() {}.getType();
+        Type type = new TypeToken<ArrayList<Contacts>>() {
+        }.getType();
         return gson.fromJson(json, type);
     }
 }

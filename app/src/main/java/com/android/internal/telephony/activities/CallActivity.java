@@ -12,12 +12,10 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.android.internal.telephony.R;
-import com.android.internal.telephony.contacts.AvailableContacts;
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.contacts.Logs;
 import com.android.internal.telephony.fragments.CallProcessFragment;
 import com.android.internal.telephony.fragments.IncomeCallFragment;
-import com.android.internal.telephony.services.CallService;
 import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -35,13 +33,14 @@ import java.util.Calendar;
 
 /**
  * There are two components can fire this activity
+ *
  * @link {HomeActivity.class}
  * @link SignlingService
- *
+ * <p>
  * This activity will manage call events:
- *  - Incomming call
- *  - Outgoing call
- *  - end call
+ * - Incomming call
+ * - Outgoing call
+ * - end call
  * At incoming call
  * it will push Incoming call fragment
  * At Accept or reject, This activity must send signal to signaling server
@@ -65,20 +64,20 @@ public class CallActivity extends FragmentActivity {
         public void onReceive(Context context, Intent intent) {
             //In case user accept call
             //open call Instance by sending broadcast to calling service
-            if(intent.getAction()!= null && intent.getAction().equals("CALL_ACCEPTED")) {
+            if (intent.getAction() != null && intent.getAction().equals("CALL_ACCEPTED")) {
                 Intent i = new Intent();
                 i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
                 i.putExtra(Constants.Calling.MAKE_CALL_ACTION_PARAM, mDeviceIP);
                 sendBroadcast(i);
                 try {
                     pushCallProcessFragment(mDevicePhoneNumber);
-                }catch (IllegalStateException ex){
-                    Log.e(TAG,"There are an error in CallActivity. ",ex);
+                } catch (IllegalStateException ex) {
+                    Log.e(TAG, "There are an error in CallActivity. ", ex);
                 }
-            }else if(intent.getAction()!= null && intent.getAction().equals("CALL_ENDED")) {
+            } else if (intent.getAction() != null && intent.getAction().equals("CALL_ENDED")) {
                 Intent i = new Intent();
                 i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
-                i.putExtra("END","END");
+                i.putExtra("END", "END");
                 sendBroadcast(i);
                 CallActivity.this.finish();
             }
@@ -96,7 +95,7 @@ public class CallActivity extends FragmentActivity {
         //register broadcast receiver
         IntentFilter intentFilter = new IntentFilter("CALL_ACCEPTED");
         intentFilter.addAction("CALL_ENDED");
-        registerReceiver(mBroadcastReceiver,intentFilter);
+        registerReceiver(mBroadcastReceiver, intentFilter);
 
         //Get Intent and put it in global intent var
         mIntent = getIntent();
@@ -105,15 +104,15 @@ public class CallActivity extends FragmentActivity {
         //Get Phone Number
         mDevicePhoneNumber = mIntent.getStringExtra("PHONE_NUM");
 
-        Log.i(TAG,String.format("Phone number is %s ",mDevicePhoneNumber));
+        Log.i(TAG, String.format("Phone number is %s ", mDevicePhoneNumber));
         //Process Intent, by get call type
-        if(mIntent.getStringExtra("CALL_TYPE").equals("OUTGOING")){
-            if(mCallTech.equals("D2D")) {
+        if (mIntent.getStringExtra("CALL_TYPE").equals("OUTGOING")) {
+            if (mCallTech.equals("D2D")) {
                 //Case D2D outgoing call
                 try {
                     mDeviceIP = Constants.getPhoneNumber(mDevicePhoneNumber).second;//Second is device ip
-                }catch (Exception ex){
-                    Log.d(TAG,"Device not found please handle it");
+                } catch (Exception ex) {
+                    Log.d(TAG, "Device not found please handle it");
                     this.finish();
                 }
                 mCallTech = "D2D";
@@ -123,49 +122,48 @@ public class CallActivity extends FragmentActivity {
                 sendSignal(signalMsg);
                 Intent intent = new Intent();
                 intent.setAction(Constants.Calling.CALL_SERVICE_ACTION);
-                intent.putExtra("OUTGOING","OUTGOING");
+                intent.putExtra("OUTGOING", "OUTGOING");
                 sendBroadcast(intent);
 
-                addLogs(mDevicePhoneNumber,R.drawable.forward_call,"D2D");
+                addLogs(mDevicePhoneNumber, R.drawable.forward_call, "D2D");
 
                 // push Call process fragment
                 pushCallProcessFragment(mDevicePhoneNumber);
-            }else if(mCallTech.equals("VOIP")){
-                AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
+            } else if (mCallTech.equals("VOIP")) {
+                AbtoPhone abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
                 try {
-                    abtoPhone.startCall(mDevicePhoneNumber,abtoPhone.getCurrentAccountId());
-                    addLogs(mDevicePhoneNumber,R.drawable.forward_call,"VOIP");
+                    abtoPhone.startCall(mDevicePhoneNumber, abtoPhone.getCurrentAccountId());
+                    addLogs(mDevicePhoneNumber, R.drawable.forward_call, "VOIP");
                     pushCallProcessFragment(mDevicePhoneNumber);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                     this.finish();
                 }
             }
-        }else if(mIntent.getStringExtra("CALL_TYPE").equals("INCOMING")){
-            Log.i(TAG,"Incoming call");
+        } else if (mIntent.getStringExtra("CALL_TYPE").equals("INCOMING")) {
+            Log.i(TAG, "Incoming call");
             //check if incoming call tech is d2d
-            if(mCallTech!= null && mIntent.getStringExtra("CALL_TECH").equals("D2D")){
+            if (mCallTech != null && mIntent.getStringExtra("CALL_TECH").equals("D2D")) {
                 mDeviceIP = mIntent.getStringExtra("PHONE_IP");
                 mIncomePhoneNumber = mIntent.getStringExtra("PHONE_NUM");
-                mIncomePhoneNumber = mIncomePhoneNumber.substring(0,11);
-                Log.i(TAG, String.format("Incoming Phone ip is: %s",mDeviceIP));
+                mIncomePhoneNumber = mIncomePhoneNumber.substring(0, 11);
+                Log.i(TAG, String.format("Incoming Phone ip is: %s", mDeviceIP));
 
-            }
-            else if (mCallTech!= null && mIntent.getStringExtra("CALL_TECH").equals("VOIP")) {
+            } else if (mCallTech != null && mIntent.getStringExtra("CALL_TECH").equals("VOIP")) {
                 mIncomePhoneNumber = mIntent.getStringExtra(AbtoPhone.REMOTE_CONTACT);
-                mIncomePhoneNumber = mIncomePhoneNumber.substring(0,11);
-                Log.i(TAG, String.format("Incoming Phone no is:%s",mIncomePhoneNumber));
+                mIncomePhoneNumber = mIncomePhoneNumber.substring(0, 11);
+                Log.i(TAG, String.format("Incoming Phone no is:%s", mIncomePhoneNumber));
 
             }
             //Case incoming call p ush Call incoming call fragment
-            pushIncomingCallFragment(mIncomePhoneNumber,mIntent.getStringExtra("CALL_TECH"));
+            pushIncomingCallFragment(mIncomePhoneNumber, mIntent.getStringExtra("CALL_TECH"));
         }
 
     }
 
-    public void answerCall(){
-        if(mCallTech.equals("D2D")){
-            Log.i(TAG,"Answer call invoked");
+    public void answerCall() {
+        if (mCallTech.equals("D2D")) {
+            Log.i(TAG, "Answer call invoked");
             //Start Calling Server By sending broadcast to CallService
             Intent i = new Intent();
             i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
@@ -173,15 +171,15 @@ public class CallActivity extends FragmentActivity {
             //Send accept to recipient By send broadcast to signaling server to send it
             i = new Intent();
             i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
-            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE,"_accept_");
+            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE, "_accept_");
             sendBroadcast(i);
-            addLogs(mIncomePhoneNumber,R.drawable.income_call,"D2D");
+            addLogs(mIncomePhoneNumber, R.drawable.income_call, "D2D");
 
-        }else if(mCallTech.equals("VOIP")){
-            AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
+        } else if (mCallTech.equals("VOIP")) {
+            AbtoPhone abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
             try {
                 abtoPhone.answerCall(200);
-                addLogs(mIncomePhoneNumber,R.drawable.income_call,"VOIP");
+                addLogs(mIncomePhoneNumber, R.drawable.income_call, "VOIP");
                 abtoPhone.setCallDisconnectedListener((s, i, i1) -> this.finish());
                 pushCallProcessFragment(mDevicePhoneNumber);
             } catch (RemoteException e) {
@@ -191,24 +189,25 @@ public class CallActivity extends FragmentActivity {
         }
 
     }
-    public void endCall(){
-        if(mCallTech.equals("D2D")){
-            Log.i(TAG,"End call invoked");
+
+    public void endCall() {
+        if (mCallTech.equals("D2D")) {
+            Log.i(TAG, "End call invoked");
             //End Calling Server By sending broadcast to CallService
             Intent i = new Intent();
             i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
-            i.putExtra("END","END");
+            i.putExtra("END", "END");
             sendBroadcast(i);
             //Send end to recipient By send broadcast to signaling server to send it
             i = new Intent();
             i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
-            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE,"_end_");
-            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS,mDeviceIP);
+            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE, "_end_");
+            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS, mDeviceIP);
             sendBroadcast(i);
             //finish this activity
             this.finish();
-        }else if(mCallTech.equals("VOIP")){
-            AbtoPhone abtoPhone = ((AbtoApplication)getApplication()).getAbtoPhone();
+        } else if (mCallTech.equals("VOIP")) {
+            AbtoPhone abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
             abtoPhone.setCallDisconnectedListener(null);
             try {
                 abtoPhone.hangUp();
@@ -219,46 +218,49 @@ public class CallActivity extends FragmentActivity {
         }
 
     }
-    private void sendSignal(String signal){
+
+    private void sendSignal(String signal) {
         Intent i = new Intent();
         i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
-        i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE,signal);
-        if(mDeviceIP != null)
-            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS,mDeviceIP);
+        i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE, signal);
+        if (mDeviceIP != null)
+            i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS, mDeviceIP);
         sendBroadcast(i);
-        Log.i(TAG,"BroadCast sent");
+        Log.i(TAG, "BroadCast sent");
     }
+
     private void pushIncomingCallFragment(String phoneNumber, String tech) {
-        if(mCallFragment == null) mCallFragment = new IncomeCallFragment();
+        if (mCallFragment == null) mCallFragment = new IncomeCallFragment();
         mCallFragment.setPhoneNumber(phoneNumber);
         mCallFragment.callTech(tech);
         mCallFragment.setArguments(mIntent.getExtras());
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragsContainer,mCallFragment)
+                .replace(R.id.fragsContainer, mCallFragment)
                 .commit();
     }
+
     private void pushCallProcessFragment(String phoneNumber) {
 
-        if(mProcessCallFrag == null) mProcessCallFrag = new CallProcessFragment();
+        if (mProcessCallFrag == null) mProcessCallFrag = new CallProcessFragment();
         mProcessCallFrag.setPhoneNumber(phoneNumber);
         mProcessCallFrag.setArguments(mIntent.getExtras());
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragsContainer,mProcessCallFrag).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragsContainer, mProcessCallFrag).commit();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mBroadcastReceiver);
-        saveLogsList(mLogs,"LOGS");
+        saveLogsList(mLogs, "LOGS");
 
     }
 
-    private void addLogs(String phoneNumber, int iconResId, String CallTech){
+    private void addLogs(String phoneNumber, int iconResId, String CallTech) {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         String time = sdf.format(cal.getTime());
         ArrayList<Contacts> contacts = getContactsList("CONTACTS");
-        Log.w("phoneNo",phoneNumber);
+        Log.w("phoneNo", phoneNumber);
         String contactName = phoneNumber;
         try {
             for (int j = 0; j < contacts.size(); j++) {
@@ -267,10 +269,10 @@ public class CallActivity extends FragmentActivity {
                     contactName = user.getContactName();
                 }
             }
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
-        addLogs(new Logs(contactName,iconResId,CallTech,time));
+        addLogs(new Logs(contactName, iconResId, CallTech, time));
     }
 
     public ArrayList<Contacts> getContactsList(String key) {
@@ -282,11 +284,11 @@ public class CallActivity extends FragmentActivity {
         return gson.fromJson(json, type);
     }
 
-    public static void addLogs(Logs contact){
+    public static void addLogs(Logs contact) {
         mLogs.add(contact);
     }
 
-    public void saveLogsList(ArrayList<Logs> list, String key){
+    public void saveLogsList(ArrayList<Logs> list, String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
         SharedPreferences.Editor editor = prefs.edit();
         Gson gson = new Gson();

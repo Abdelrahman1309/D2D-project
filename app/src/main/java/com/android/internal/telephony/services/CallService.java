@@ -12,14 +12,15 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.android.internal.telephony.utils.Constants;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import io.reactivex.disposables.CompositeDisposable;
 
 //Todo (1) register broadcast receiver to receive commands from other app parts - done
 //Todo (2) Initiate call server or call instance as required
@@ -33,7 +34,7 @@ public class CallService extends Service {
     private static final int SAMPLE_SIZE = 2; // Bytes
     private static final int minBufSize = SAMPLE_INTERVAL * SAMPLE_INTERVAL * SAMPLE_SIZE * 2; //Bytes
     private static String mTag;
-    private short x = 0,y = 0;
+    private short x = 0, y = 0;
 
     @Override
     public void onCreate() {
@@ -68,7 +69,7 @@ public class CallService extends Service {
                     DatagramPacket receivePacket = new DatagramPacket(receiveData, minBufSize);
                     //receive data from server socket and hold it in receivePacket
                     serverSocket.receive(receivePacket);
-                    Log.i(mTag, "Call server recived packet its size is: " + receivePacket.getData().length);
+                    Log.i("Speaker", "Recived packet & its size is: " + receivePacket.getData().length);
                     //write recived data to speaker
                     atrack.write(receivePacket.getData(), 0, minBufSize);
                 }
@@ -77,7 +78,7 @@ public class CallService extends Service {
                 atrack.stop();
                 atrack.flush();
                 atrack.release();
-                Log.w("Call server"," is closed");
+                Log.w("Speaker", " is closed");
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (UnknownHostException e) {
@@ -114,13 +115,13 @@ public class CallService extends Service {
                     DatagramPacket sendPacket = new DatagramPacket(buffer, bytes_read, destination, Constants.Calling.CALLING_SERVER_PORT);
                     //Send voice packet to destination
                     socket.send(sendPacket);
-                    Log.i(Constants.TAG, "call instance sent data its length is: " + sendPacket.getData().length);
+                    Log.i("Mic", "Sent data & its length is: " + sendPacket.getData().length);
                 }
                 socket.disconnect();
                 socket.close();
                 recorder.stop();
                 recorder.release();
-                Log.w("Call Instance"," is closed");
+                Log.w("Mic", " is closed");
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (UnknownHostException e) {

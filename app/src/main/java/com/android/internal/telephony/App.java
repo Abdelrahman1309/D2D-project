@@ -16,10 +16,6 @@ import com.android.internal.telephony.utils.NetworkUtils;
 
 import org.abtollc.sdk.AbtoApplication;
 
-/**
- * Created by Eslam on 1/22/2018.
- */
-
 public class App extends AbtoApplication {
 
     @Override
@@ -43,16 +39,16 @@ public class App extends AbtoApplication {
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
             super.onSignalStrengthsChanged(signalStrength);
-            Constants.setCurrentCellularLevel((short)signalStrength.getLevel());
+            Constants.setCurrentCellularLevel((short) signalStrength.getLevel());
             //read wifi
-            if(!NetworkUtils.getWifiState(getApplicationContext())){
+            if (!NetworkUtils.getWifiState(getApplicationContext())) {
                 NetworkUtils.turnOnWifi(getApplicationContext());
             }
             Constants.setDeviceIP(NetworkUtils.getWifiApIpAddress());
             Constants.setCurrentWifiLevel((short) NetworkUtils.getWifiSignalLevel(getApplicationContext()));
             Constants.setCurrentCellularLevel((short) signalStrength.getLevel());
-            Log.i(Constants.TAG,String.format("Current cellular level is: %d",signalStrength.getLevel()));
-            Log.i(Constants.TAG,String.format("Current wifi level is: %d", NetworkUtils.getWifiSignalLevel(getApplicationContext())));
+            Log.i(Constants.TAG, String.format("Current cellular level is: %d", signalStrength.getLevel()));
+            Log.i(Constants.TAG, String.format("Current wifi level is: %d", NetworkUtils.getWifiSignalLevel(getApplicationContext())));
         }
     }
 

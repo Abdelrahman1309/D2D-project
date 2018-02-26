@@ -7,21 +7,26 @@ public class Logs {
     private String mTechnology;
     private int mIcon;
 
-    public Logs (String name, int icon , String technology, String date ){
+    public Logs(String name, int icon, String technology, String date) {
         mName = name;
         mIcon = icon;
         mTechnology = technology;
         mDate = date;
     }
 
-    public String getLogName(){
+    public String getLogName() {
         return mName;
     }
-    public int getLogIcon(){return mIcon;}
-    public String getLogTechnology(){
+
+    public int getLogIcon() {
+        return mIcon;
+    }
+
+    public String getLogTechnology() {
         return mTechnology;
     }
-    public String getLogDate(){
+
+    public String getLogDate() {
         return mDate;
     }
 }
