@@ -42,7 +42,6 @@ import java.util.TimerTask;
 public class CallProcessFragment extends Fragment {
     String phoneNumber;
     TextView displayNumber,timer,displayName;
-    int seconds = 0,min = 0;boolean running;
     ImageView speaker,endCall,keypad,mute;
     boolean isOddClicked = true;
     AudioManager audioManager;

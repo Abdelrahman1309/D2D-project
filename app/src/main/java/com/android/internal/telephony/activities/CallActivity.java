@@ -184,6 +184,7 @@ public class CallActivity extends FragmentActivity {
                 abtoPhone.answerCall(200);
                 addLogs(mIncomePhoneNumber, R.drawable.income_call, "VOIP");
                 abtoPhone.setCallDisconnectedListener((s, i, i1) -> this.finish());
+                pushCallProcessFragment(mDevicePhoneNumber);
 
             } catch (RemoteException e) {
                 e.printStackTrace();
