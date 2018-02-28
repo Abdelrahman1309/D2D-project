@@ -5,16 +5,20 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
+
+import static android.content.Context.POWER_SERVICE;
 
 //Todo (1) Display call from and accept and reject call
 //Todo (2) Interact with Service
@@ -51,6 +55,19 @@ public class IncomeCallFragment extends Fragment {
             ringTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
             r = RingtoneManager.getRingtone(getContext(), ringTone);
             r.play();
+        }
+
+        try {
+            PowerManager.WakeLock screenLock = ((PowerManager) getActivity().getSystemService(POWER_SERVICE)).newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG");
+            screenLock.acquire(1000L );
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD|
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        }catch (NullPointerException ex){
+            ex.printStackTrace();
+
         }
 
         mAnswer.setOnClickListener(v1 -> {

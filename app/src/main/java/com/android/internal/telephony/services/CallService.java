@@ -147,6 +147,7 @@ public class CallService extends Service {
             if (intent.getStringExtra("END") != null && intent.getStringExtra("END").equals("END")) {
                 mRunCallingInstance = false;
                 mRunCallingServer = false;
+                Constants.callState = false;
                 x = 0;
                 y = 0;
                 return;

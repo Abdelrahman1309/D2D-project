@@ -49,6 +49,7 @@ public class CallActivity extends FragmentActivity {
 
     private static String TAG;
     private static ArrayList<Logs> mLogs = new ArrayList<>();
+    long timer = 0; boolean callCheck = true;
     //Fragments
     private IncomeCallFragment mCallFragment;
     private CallProcessFragment mProcessCallFrag;
@@ -69,6 +70,7 @@ public class CallActivity extends FragmentActivity {
                 i.setAction(Constants.Calling.CALL_SERVICE_ACTION);
                 i.putExtra(Constants.Calling.MAKE_CALL_ACTION_PARAM, mDeviceIP);
                 sendBroadcast(i);
+                startTimer();
                 try {
                     pushCallProcessFragment(mDevicePhoneNumber);
                 } catch (IllegalStateException ex) {
@@ -173,6 +175,7 @@ public class CallActivity extends FragmentActivity {
             i.setAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
             i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_MESSAGE, "_accept_");
             sendBroadcast(i);
+            pushCallProcessFragment(mDevicePhoneNumber);
             addLogs(mIncomePhoneNumber, R.drawable.income_call, "D2D");
 
         } else if (mCallTech.equals("VOIP")) {
@@ -181,7 +184,7 @@ public class CallActivity extends FragmentActivity {
                 abtoPhone.answerCall(200);
                 addLogs(mIncomePhoneNumber, R.drawable.income_call, "VOIP");
                 abtoPhone.setCallDisconnectedListener((s, i, i1) -> this.finish());
-                pushCallProcessFragment(mDevicePhoneNumber);
+
             } catch (RemoteException e) {
                 e.printStackTrace();
                 this.finish();
@@ -205,11 +208,13 @@ public class CallActivity extends FragmentActivity {
             i.putExtra(Constants.Signaling.SIGNALING_SERVICE_ACTION_IP_ADDRESS, mDeviceIP);
             sendBroadcast(i);
             //finish this activity
+            callCheck = false;
             this.finish();
         } else if (mCallTech.equals("VOIP")) {
             AbtoPhone abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
             abtoPhone.setCallDisconnectedListener(null);
             try {
+                callCheck = false;
                 abtoPhone.hangUp();
                 CallActivity.this.finish();
             } catch (RemoteException e) {
@@ -252,6 +257,8 @@ public class CallActivity extends FragmentActivity {
         super.onDestroy();
         unregisterReceiver(mBroadcastReceiver);
         saveLogsList(mLogs, "LOGS");
+        callCheck = false;
+        timer = 0;
 
     }
 
@@ -296,4 +303,25 @@ public class CallActivity extends FragmentActivity {
         editor.putString(key, json);
         editor.apply();     // This line is IMPORTANT !!!
     }
+
+    public void startTimer(){
+        Thread thread = new Thread(() -> {
+            while(callCheck) {
+                try {
+                    Intent i = new Intent();
+                    i.setAction("TIMER");
+                    i.putExtra("Timer",timer);
+                    sendBroadcast(i);
+                    Thread.sleep(1000);
+                    timer = timer + 1000;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+
+
 }

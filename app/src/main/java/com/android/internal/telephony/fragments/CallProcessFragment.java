@@ -1,13 +1,21 @@
 package com.android.internal.telephony.fragments;
 
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,20 +25,25 @@ import android.widget.TextView;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.contacts.Contacts;
+import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 //Todo (1) Start Call Time Counter
 //Todo (2) End calls
 public class CallProcessFragment extends Fragment {
     String phoneNumber;
-    TextView displayNumber;
-    TextView displayName;
-    ImageView speaker;
+    TextView displayNumber,timer,displayName;
+    int seconds = 0,min = 0;boolean running;
+    ImageView speaker,endCall,keypad,mute;
     boolean isOddClicked = true;
     AudioManager audioManager;
 
@@ -42,18 +55,24 @@ public class CallProcessFragment extends Fragment {
         phoneNumber = number;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_call_process, container, false);
-        ImageView endCall = v.findViewById(R.id.endCallFragBtn);
-        ImageView keypad = v.findViewById(R.id.keypad);
-        ImageView mute = v.findViewById(R.id.mute);
+
+        endCall       = v.findViewById(R.id.endCallFragBtn);
+        keypad        = v.findViewById(R.id.keypad);
+        mute          = v.findViewById(R.id.mute);
         displayNumber = v.findViewById(R.id.display_phone_num);
-        displayName = v.findViewById(R.id.display_name);
-        speaker = v.findViewById(R.id.speaker);
-        TextView timer = v.findViewById(R.id.timer);
+        displayName   = v.findViewById(R.id.display_name);
+        speaker       = v.findViewById(R.id.speaker);
+        timer         = v.findViewById(R.id.timer);
+
+        IntentFilter intentFilter = new IntentFilter("TIMER");
+        intentFilter.addAction("CALL_ENDED");
+        getActivity().registerReceiver(mTimerBroadCastReceiver, intentFilter);
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(AudioManager.MODE_IN_CALL);
@@ -96,7 +115,6 @@ public class CallProcessFragment extends Fragment {
         mute.setOnClickListener(v1 -> {
 
         });
-
         return v;
     }
 
@@ -105,8 +123,8 @@ public class CallProcessFragment extends Fragment {
         displayNumber.clearComposingText();
         isOddClicked = true;
         speaker.getDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
-    }
 
+    }
     public ArrayList<Contacts> getContactsList(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Gson gson = new Gson();
@@ -114,5 +132,22 @@ public class CallProcessFragment extends Fragment {
         Type type = new TypeToken<ArrayList<Contacts>>() {
         }.getType();
         return gson.fromJson(json, type);
+    }
+
+    private BroadcastReceiver mTimerBroadCastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null && intent.getAction().equals("TIMER")) {
+                Date dateObject = new Date(intent.getLongExtra("Timer",0));
+                SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
+                timer.setText(timeFormat.format(dateObject));
+            }
+        }
+    };
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        getActivity().unregisterReceiver(mTimerBroadCastReceiver);
     }
 }

@@ -74,6 +74,7 @@ public final class Constants {
 
     public static final String NETWORK_PASSWORD = "123456789";
 
+    public static boolean callState;
 
     private static Map<String, String> mPhonesMap = new HashMap<>();
     private static List<String> mAvailableDevices = new ArrayList<>();
