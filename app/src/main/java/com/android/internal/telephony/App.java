@@ -41,14 +41,15 @@ public class App extends AbtoApplication {
             super.onSignalStrengthsChanged(signalStrength);
             Constants.setCurrentCellularLevel((short) signalStrength.getLevel());
             //read wifi
-            if (!NetworkUtils.getWifiState(getApplicationContext())) {
-                NetworkUtils.turnOnWifi(getApplicationContext());
+            if (NetworkUtils.getWifiState(getApplicationContext())) {
+                //NetworkUtils.turnOnWifi(getApplicationContext());
+                Constants.setDeviceIP(NetworkUtils.getWifiApIpAddress());
+                Constants.setCurrentWifiLevel((short) NetworkUtils.getWifiSignalLevel(getApplicationContext()));
+                Constants.setCurrentCellularLevel((short) signalStrength.getLevel());
+                Log.i(Constants.TAG, String.format("Current cellular level is: %d", signalStrength.getLevel()));
+                Log.i(Constants.TAG, String.format("Current wifi level is: %d", NetworkUtils.getWifiSignalLevel(getApplicationContext())));
             }
-            Constants.setDeviceIP(NetworkUtils.getWifiApIpAddress());
-            Constants.setCurrentWifiLevel((short) NetworkUtils.getWifiSignalLevel(getApplicationContext()));
-            Constants.setCurrentCellularLevel((short) signalStrength.getLevel());
-            Log.i(Constants.TAG, String.format("Current cellular level is: %d", signalStrength.getLevel()));
-            Log.i(Constants.TAG, String.format("Current wifi level is: %d", NetworkUtils.getWifiSignalLevel(getApplicationContext())));
+
         }
     }
 
