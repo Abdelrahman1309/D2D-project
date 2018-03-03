@@ -38,18 +38,15 @@
         android:label="D2D"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SplashActivity"
-            android:theme="@style/SplashActivityTheme">
+        <activity android:name=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.HomeActivity"
-            android:theme="@style/AppTheme"/>
-        <activity android:name=".activities.CallActivity"
-            android:theme="@style/AppTheme"/>
+        <activity android:name=".activities.HomeActivity"/>
+        <activity android:name=".activities.CallActivity"/>
 
         <service
             android:name=".services.SignalingService"

@@ -8,8 +8,5 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="SplashActivityTheme" parent="AppTheme">
-        <item name="colorPrimaryDark">#d32f2f</item>
-    </style>
 
 </resources>
