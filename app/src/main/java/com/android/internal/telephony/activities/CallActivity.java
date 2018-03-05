@@ -48,7 +48,7 @@ import java.util.Calendar;
 public class CallActivity extends FragmentActivity {
 
     private static String TAG;
-    private static ArrayList<Logs> mLogs = new ArrayList<>();
+    private static ArrayList<Logs> mLogs;
     long timer = 0; boolean callCheck = true;
     //Fragments
     private IncomeCallFragment mCallFragment;
@@ -92,6 +92,8 @@ public class CallActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call);
+
+        mLogs = getLogsList("LOGS");
 
         TAG = this.getClass().getSimpleName();
         //register broadcast receiver
@@ -323,6 +325,13 @@ public class CallActivity extends FragmentActivity {
         thread.start();
     }
 
-
+    public ArrayList<Logs> getLogsList(String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<Logs>>() {
+        }.getType();
+        return gson.fromJson(json, type);
+    }
 
 }

@@ -81,6 +81,7 @@ public final class Constants {
 
     private static String mDeviceIP;
     private static String mPhoneNumber;
+    private static boolean mVOIP;
     //private static String mOtherPhoneNumber;
     private static String mCurrentWifiSSID;
     private static short currentWifiLevel;
@@ -135,6 +136,14 @@ public final class Constants {
         Constants.mPhoneNumber = mPhoneNumber;
     }
 
+
+    public static boolean getSipServerState(){
+        return mVOIP;
+    }
+
+    public static void sipServerState (boolean state){
+        Constants.mVOIP = state;
+    }
 
     public static void addNearbyDevice(String number) {
         if (!mAvailableDevices.contains(number) && !number.equals(mPhoneNumber)) {

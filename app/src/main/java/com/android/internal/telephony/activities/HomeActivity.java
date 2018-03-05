@@ -207,7 +207,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .setMessage("Please Select call technology")
                 .setPositiveButton("VOIP", (dialog, which) -> {
                     i.putExtra("CALL_TECH", "VOIP");
-                    startActivity(i);
+                    if(Constants.getSipServerState()) {
+                        startActivity(i);
+                    } else {
+                        Toast toast = Toast.makeText(getApplicationContext(), "SIP Server Not Registered", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 })
                 .setNegativeButton("D2D", (dialog, which) -> {
                     // do nothing

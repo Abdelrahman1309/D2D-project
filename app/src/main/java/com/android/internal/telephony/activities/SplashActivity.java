@@ -364,7 +364,7 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
         devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM, "SHARED_PREF_PHONE_NUM");
         String user = devicePhoneNumber;
         String pass = "ab" + devicePhoneNumber;
-        String domain = "192.168.1.4";
+        String domain = "192.168.1.12";
         abtoPhone.getConfig().addAccount(domain, null, user, pass, null, "", 300, false);
         try {
             abtoPhone.register();
@@ -376,11 +376,13 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
 
             public void onRegistrationFailed(long accId, int statusCode, String statusText) {
                 Log.i(Constants.TAG, "SIP RegistrationFailed");
+                Constants.sipServerState(false);
 //                openHomeActivity();
             }
 
             public void onRegistered(long accId) {
                 Log.i(Constants.TAG, "SIP Registered");
+                Constants.sipServerState(true);
 //                openHomeActivity();
             }
 
