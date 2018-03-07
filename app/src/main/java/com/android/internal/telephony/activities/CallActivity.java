@@ -155,7 +155,7 @@ public class CallActivity extends FragmentActivity {
 
             } else if (mCallTech != null && mIntent.getStringExtra("CALL_TECH").equals("VOIP")) {
                 mIncomePhoneNumber = mIntent.getStringExtra(AbtoPhone.REMOTE_CONTACT);
-                mIncomePhoneNumber = mIncomePhoneNumber.substring(0, 11);
+                mIncomePhoneNumber = mIncomePhoneNumber.substring(1, 12);
                 Log.i(TAG, String.format("Incoming Phone no is:%s", mIncomePhoneNumber));
 
             }
@@ -187,6 +187,7 @@ public class CallActivity extends FragmentActivity {
                 addLogs(mIncomePhoneNumber, R.drawable.income_call, "VOIP");
                 abtoPhone.setCallDisconnectedListener((s, i, i1) -> this.finish());
                 pushCallProcessFragment(mDevicePhoneNumber);
+                startTimer();
 
             } catch (RemoteException e) {
                 e.printStackTrace();

@@ -1,6 +1,7 @@
 package com.android.internal.telephony.activities;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -30,7 +31,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 //Todo (1) Receive New wifi networks
 //Todo (2) Send Phone Call Intent to CallActivity
@@ -39,17 +42,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FragmentTransaction transaction;
     Button btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, star, hash, contact, recents;
     ImageView backSpace, mCall, refresh;
-    TextView mPhone;
+    TextView mPhone,lastUpdate;
     SearchView search;
     FrameLayout searchBar;
     SharedPreferences prefs;
-    String devicePhoneNumber;
+    String devicePhoneNumber,update;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         identifyNumbers();
+        prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
+        update = prefs.getString(Constants.SharedPref.LAST_UPDATED, "12:00 am");
+        lastUpdate.setText("Last update: "+ update);
         searchBar.setVisibility(View.VISIBLE);
 
     }
@@ -142,33 +148,46 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 ListView listView = findViewById(R.id.available_contacts);
                 ArrayList<AvailableContacts> availableContacts = availableContacts();
                 listView.setAdapter(new AvailableContactsAdapter(getApplication(), availableContacts));
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a, EEE");
+                String time = sdf.format(cal.getTime());
+                SharedPreferences.Editor editor = getSharedPreferences(Constants.SharedPref.SHARED_PREF, Context.MODE_PRIVATE).edit();
+                editor.putString(Constants.SharedPref.LAST_UPDATED, time);
+                editor.apply();
+                lastUpdate.setText("Last update: "+ time);
         }
 
 
     }
 
-    private void identifyNumbers() {
-        btn0 = findViewById(R.id.btn0);
-        btn1 = findViewById(R.id.btn1);
-        btn2 = findViewById(R.id.btn2);
-        btn3 = findViewById(R.id.btn3);
-        btn4 = findViewById(R.id.btn4);
-        btn5 = findViewById(R.id.btn5);
-        btn6 = findViewById(R.id.btn6);
-        btn7 = findViewById(R.id.btn7);
-        btn8 = findViewById(R.id.btn8);
-        btn9 = findViewById(R.id.btn9);
-        star = findViewById(R.id.star);
-        hash = findViewById(R.id.hash);
-        mCall = findViewById(R.id.call);
-        mPhone = findViewById(R.id.phoneNum);
-        refresh = findViewById(R.id.refresh);
-        backSpace = findViewById(R.id.back_space);
-        contact = findViewById(R.id.contact);
-        recents = findViewById(R.id.recents);
-        search = findViewById(R.id.search);
-        searchBar = findViewById(R.id.search_frame);
+    @Override
+    public void onBackPressed() {
+        searchBar.setVisibility(View.VISIBLE);
+        super.onBackPressed();
+    }
 
+    private void identifyNumbers() {
+        btn0      = findViewById(R.id.btn0);
+        btn1      = findViewById(R.id.btn1);
+        btn2      = findViewById(R.id.btn2);
+        btn3      = findViewById(R.id.btn3);
+        btn4      = findViewById(R.id.btn4);
+        btn5      = findViewById(R.id.btn5);
+        btn6      = findViewById(R.id.btn6);
+        btn7      = findViewById(R.id.btn7);
+        btn8      = findViewById(R.id.btn8);
+        btn9      = findViewById(R.id.btn9);
+        star      = findViewById(R.id.star);
+        hash      = findViewById(R.id.hash);
+        mCall     = findViewById(R.id.call);
+        mPhone    = findViewById(R.id.phoneNum);
+        refresh   = findViewById(R.id.refresh);
+        backSpace = findViewById(R.id.back_space);
+        contact   = findViewById(R.id.contact);
+        recents   = findViewById(R.id.recents);
+        search    = findViewById(R.id.search);
+        searchBar = findViewById(R.id.search_frame);
+        lastUpdate= findViewById(R.id.last_update);
 
         btn0.setOnClickListener(this);
         btn1.setOnClickListener(this);

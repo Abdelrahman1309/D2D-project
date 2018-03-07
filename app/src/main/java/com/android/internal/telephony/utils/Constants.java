@@ -14,6 +14,8 @@ public final class Constants {
         public static final String SHARED_PREF = "D2D_SHARED_PREF";
         public static final String SHARED_PREF_PHONE_NUM = "SHARED_PREF_PHONE_NUM";
         public static final String ASK_NUMBER_DLG = "ASK_NUMBER_DLG";
+        public static final String LAST_UPDATED = "LAST_UPDATE: 12:00 AM";
+
     }
 
     public static final class Signaling {

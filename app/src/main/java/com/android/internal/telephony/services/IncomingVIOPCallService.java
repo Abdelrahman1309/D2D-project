@@ -46,4 +46,5 @@ public class IncomingVIOPCallService extends Service implements OnIncomingCallLi
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
 }

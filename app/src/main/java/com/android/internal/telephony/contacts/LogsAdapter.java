@@ -1,6 +1,7 @@
 package com.android.internal.telephony.contacts;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,18 +33,21 @@ public class LogsAdapter extends ArrayAdapter<Logs> {
         }
         Logs currentLog = getItem(position);
 
-        TextView name = listItemView.findViewById(R.id.log_name);
-        name.setText(currentLog.getLogName());
+        try {
+            TextView name = listItemView.findViewById(R.id.log_name);
+            name.setText(currentLog.getLogName());
 
-        TextView tech = listItemView.findViewById(R.id.log_technology);
-        tech.setText(currentLog.getLogTechnology());
+            TextView tech = listItemView.findViewById(R.id.log_technology);
+            tech.setText(currentLog.getLogTechnology());
 
-        TextView date = listItemView.findViewById(R.id.log_date);
-        date.setText(currentLog.getLogDate());
+            TextView date = listItemView.findViewById(R.id.log_date);
+            date.setText(currentLog.getLogDate());
 
-        ImageView icon = listItemView.findViewById(R.id.log_icon);
-        icon.setImageResource(currentLog.getLogIcon());
-
+            ImageView icon = listItemView.findViewById(R.id.log_icon);
+            icon.setImageResource(currentLog.getLogIcon());
+        }catch (Resources.NotFoundException ex){
+            ex.printStackTrace();
+        }
         return listItemView;
     }
 
