@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/D2D_Final.iml" filepath="$PROJECT_DIR$/D2D_Final.iml" />
+      <module fileurl="file://$PROJECT_DIR$/D2D-project.iml" filepath="$PROJECT_DIR$/D2D-project.iml" />
+      <module fileurl="file://E:\Projects\D2D-project\D2D_Final.iml" filepath="E:\Projects\D2D-project\D2D_Final.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

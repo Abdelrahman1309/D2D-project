@@ -22,12 +22,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.internal.telephony.App;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.contacts.Contacts;
 import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.abtollc.sdk.OnCallDisconnectedListener;
 
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
@@ -77,6 +80,9 @@ public class CallProcessFragment extends Fragment {
         audioManager.setMode(AudioManager.MODE_IN_CALL);
         audioManager.setSpeakerphoneOn(false);
 
+        //Set VOIP Call disconnected listner
+        ((App)getActivity().getApplication()).getAbtoPhone().setCallDisconnectedListener(this::endCall);
+
         ArrayList<Contacts> contacts = getContactsList("CONTACTS");
         displayNumber.setText(phoneNumber);
         try {
@@ -115,6 +121,10 @@ public class CallProcessFragment extends Fragment {
 
         });
         return v;
+    }
+
+    private void endCall(String s, int i, int i1){
+        endCall();
     }
 
     private void endCall() {
