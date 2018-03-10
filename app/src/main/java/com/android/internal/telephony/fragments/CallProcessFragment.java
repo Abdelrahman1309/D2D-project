@@ -1,6 +1,5 @@
 package com.android.internal.telephony.fragments;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,32 +8,27 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.android.internal.telephony.App;
 import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.contacts.Contacts;
-import com.android.internal.telephony.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.abtollc.sdk.OnCallConnectedListener;
 
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 //Todo (1) Start Call Time Counter
@@ -77,6 +71,11 @@ public class CallProcessFragment extends Fragment {
         audioManager.setMode(AudioManager.MODE_IN_CALL);
         audioManager.setSpeakerphoneOn(false);
 
+        //Set VOIP Call disconnected listner
+        ((App)getActivity().getApplication()).getAbtoPhone().setCallDisconnectedListener(this::endCall);
+
+
+
         ArrayList<Contacts> contacts = getContactsList("CONTACTS");
         displayNumber.setText(phoneNumber);
         try {
@@ -115,6 +114,10 @@ public class CallProcessFragment extends Fragment {
 
         });
         return v;
+    }
+
+    private void endCall(String s, int i, int i1){
+        endCall();
     }
 
     private void endCall() {

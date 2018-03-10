@@ -364,7 +364,7 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
         devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM, "SHARED_PREF_PHONE_NUM");
         String user = devicePhoneNumber;
         String pass = "ab" + devicePhoneNumber;
-        String domain = "192.168.1.12";
+        String domain = "192.168.1.13";
         abtoPhone.getConfig().addAccount(domain, null, user, pass, null, "", 300, false);
         try {
             abtoPhone.register();

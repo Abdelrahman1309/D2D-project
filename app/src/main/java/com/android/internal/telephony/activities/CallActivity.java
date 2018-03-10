@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.abtollc.sdk.AbtoApplication;
 import org.abtollc.sdk.AbtoPhone;
+import org.abtollc.sdk.OnCallConnectedListener;
 
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
@@ -135,6 +136,7 @@ public class CallActivity extends FragmentActivity {
                 pushCallProcessFragment(mDevicePhoneNumber);
             } else if (mCallTech.equals("VOIP")) {
                 AbtoPhone abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
+                abtoPhone.setCallConnectedListener(s -> startTimer());
                 try {
                     abtoPhone.startCall(mDevicePhoneNumber, abtoPhone.getCurrentAccountId());
                     addLogs(mDevicePhoneNumber, R.drawable.forward_call, "VOIP");
