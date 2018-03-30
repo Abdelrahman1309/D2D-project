@@ -1,7 +1,9 @@
 package com.android.internal.telephony.services;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -31,6 +33,10 @@ public class IncomingVIOPCallService extends Service implements OnIncomingCallLi
         abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
 
         abtoPhone.setIncomingCallListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(1,new Notification());
+        }
 
         return START_STICKY;
     }

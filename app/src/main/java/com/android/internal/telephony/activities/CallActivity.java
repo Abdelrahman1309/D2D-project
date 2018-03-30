@@ -162,7 +162,9 @@ public class CallActivity extends FragmentActivity {
 
             }
             //Case incoming call p ush Call incoming call fragment
-            pushIncomingCallFragment(mIncomePhoneNumber, mIntent.getStringExtra("CALL_TECH"));
+            if (mIncomePhoneNumber != null) {
+                pushIncomingCallFragment(mIncomePhoneNumber, mIntent.getStringExtra("CALL_TECH"));
+            }
         }
 
     }
@@ -298,7 +300,11 @@ public class CallActivity extends FragmentActivity {
     }
 
     public static void addLogs(Logs contact) {
-        mLogs.add(contact);
+        try {
+            mLogs.add(contact);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public void saveLogsList(ArrayList<Logs> list, String key) {

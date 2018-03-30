@@ -1,16 +1,19 @@
 package com.android.internal.telephony.services;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.android.internal.telephony.R;
 import com.android.internal.telephony.activities.CallActivity;
 import com.android.internal.telephony.utils.Constants;
 
@@ -81,6 +84,9 @@ public class SignalingService extends Service {
         filter.addAction(Constants.Signaling.SIGNALING_SERVICE_ACTION);
         registerReceiver(receiver, filter);
         createBroadCastTimer();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(1,new Notification());
+        }
     }
 
     @Override
@@ -249,10 +255,4 @@ public class SignalingService extends Service {
         sendBroadcast(i);
     }
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDisposable.dispose();
-    }
 }

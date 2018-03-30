@@ -1,5 +1,6 @@
 package com.android.internal.telephony.services;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -46,10 +48,13 @@ public class CallService extends Service {
         IntentFilter callServiceIntentFilter = new IntentFilter();
         callServiceIntentFilter.addAction(Constants.Calling.CALL_SERVICE_ACTION);
         registerReceiver(mCallServiceReceiver, callServiceIntentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(1,new Notification());
+        }
     }
 
     private void startSpeaker() {
-        Thread thread = new Thread(() -> {
+        Thread speakerThread = new Thread(() -> {
             //Instance for speaker
             AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, Constants.Calling.SAMPLING_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
@@ -58,7 +63,7 @@ public class CallService extends Service {
             atrack.play();
             try {
                 x = 1;
-                Log.i(mTag, "Call Server started");
+                Log.i(mTag, "Speaker Thread is Started");
                 //Servers to receive from client
                 DatagramSocket serverSocket = new DatagramSocket(Constants.Calling.CALLING_SERVER_PORT);
                 //buffer to hold incoming sampled sound
@@ -87,11 +92,11 @@ public class CallService extends Service {
                 e.printStackTrace();
             }
         });
-        thread.start();
+        speakerThread.start();
     }
 
     private void startMic(String serverIP) {
-        Thread thread = new Thread(() -> {
+        Thread micThread = new Thread(() -> {
             //Instance for microphone
             AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, Constants.Calling.SAMPLING_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
@@ -99,6 +104,7 @@ public class CallService extends Service {
                             AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 10);
             try {
                 y = 1;
+                Log.i(mTag, "Mic Thread is Started");
                 //Address of destination call server
                 final InetAddress destination = InetAddress.getByName(serverIP);
                 //Servers to receive from client
@@ -130,7 +136,7 @@ public class CallService extends Service {
                 e.printStackTrace();
             }
         });
-        thread.start();
+        micThread.start();
     }
 
     @Override
@@ -165,4 +171,3 @@ public class CallService extends Service {
     };
 
 }
-

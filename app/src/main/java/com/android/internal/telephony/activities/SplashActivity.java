@@ -73,7 +73,6 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        requestRecordAudioPermission();
         ContactsAsyncTask task = new ContactsAsyncTask();
         if (askPermissions()) {
             task.execute("Contacts");
@@ -96,10 +95,17 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
         NetworkUtils.turnOnWifi(this);
         Constants.setDeviceIP(NetworkUtils.getWifiApIpAddress());
 
-        //Start signaling service
-        startService(new Intent(this, SignalingService.class));
-        startService(new Intent(this, CallService.class));
-        startService(new Intent(this, IncomingVIOPCallService.class));
+        //Start services
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            startService(new Intent(this, SignalingService.class));
+            startService(new Intent(this, CallService.class));
+            startService(new Intent(this, IncomingVIOPCallService.class));
+        }
+        else {
+            getBaseContext().startForegroundService(new Intent(this, SignalingService.class));
+            getBaseContext().startForegroundService(new Intent(this, CallService.class));
+            getBaseContext().startForegroundService(new Intent(this, IncomingVIOPCallService.class));
+        }
 
         registerReceiver(regis, new IntentFilter(Constants.Signaling.USER_REGISTER_REQUEST_SIGNAL_PARAM));
 
@@ -112,9 +118,15 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
         }
         // Get AbtoPhone instance
         abtoPhone = ((AbtoApplication) getApplication()).getAbtoPhone();
-        boolean bCanStartPhoneInitialization = (Build.VERSION.SDK_INT >= 23) ? askPermissions() : true;
+        boolean bCanStartPhoneInitialization = Build.VERSION.SDK_INT < 23 || askPermissions();
 
-        if (bCanStartPhoneInitialization) initPhone();
+        if (bCanStartPhoneInitialization) {
+            try {
+                initPhone();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
 
         prefs = getSharedPreferences(Constants.SharedPref.SHARED_PREF, MODE_PRIVATE);
         devicePhoneNumber = prefs.getString(Constants.SharedPref.SHARED_PREF_PHONE_NUM, "SHARED_PREF_PHONE_NUM");
@@ -154,38 +166,24 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
     }
 
     private void requestBasicPermissions() {
-        List<String> permissionsNeeded = new ArrayList<>();
-        final List<String> permissionsList = new ArrayList<>();
-        if (!addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE))
-            permissionsNeeded.add("READ PHONE STATE");
-        if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION))
-            permissionsNeeded.add("ACCESS COARSE LOCATION");
-        if (!addPermission(permissionsList, Manifest.permission.ACCESS_WIFI_STATE))
-            permissionsNeeded.add("ACCESS WIFI STATE");
-        if (!addPermission(permissionsList, Manifest.permission.CHANGE_WIFI_STATE))
-            permissionsNeeded.add("CHANGE WIFI STATE");
-        if (!addPermission(permissionsList, Manifest.permission.CALL_PHONE))
-            permissionsNeeded.add("CALL PHONE");
-        if (permissionsList.size() > 0) {
-            if (permissionsNeeded.size() > 0) {
-                // Need Rationale
-                //String message = "You need to grant access to " + permissionsNeeded.get(0);
-                //for (int i = 1; i < permissionsNeeded.size(); i++) message = message + ", " + permissionsNeeded.get(i);
+        if (Build.VERSION.SDK_INT > 22) {
+            String[] allPermissionNeeded = {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.CHANGE_WIFI_STATE,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.USE_SIP,
+                    Manifest.permission.CALL_PHONE,
+            };
 
-                try {
-                    ActivityCompat.requestPermissions(this,
-                            permissionsList.toArray(new String[permissionsList.size()]),
-                            REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            try {
-                ActivityCompat.requestPermissions(this,
-                        permissionsList.toArray(new String[permissionsList.size()]),
-                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            List<String> permissionNeeded = new ArrayList<>();
+            for (String permission : allPermissionNeeded)
+                if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
+                    permissionNeeded.add(permission);
+            if (permissionNeeded.size() > 0) {
+                requestPermissions(permissionNeeded.toArray(new String[0]), 0);
             }
         }
     }
@@ -203,6 +201,10 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
             permissionsNeeded.add("Record audio");
         if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             permissionsNeeded.add("Write logs to sd card");
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION))
+            permissionsNeeded.add("Access Location");
+        if (!addPermission(permissionsList, Manifest.permission.CALL_PHONE))
+            permissionsNeeded.add("Make a calls");
         if (!addPermission(permissionsList, Manifest.permission.USE_SIP))
             permissionsNeeded.add("Use SIP protocol");
         if (!addPermission(permissionsList, Manifest.permission.READ_CONTACTS))
@@ -254,26 +256,33 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
                 //Initial
                 perms.put(Manifest.permission.RECORD_AUDIO, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.CALL_PHONE, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.USE_SIP, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
 
                 //Fill with results
-                for (int i = 0; i < permissions.length; i++)
+                for (int i = 0; i < permissions.length; i++){
                     perms.put(permissions[i], grantResults[i]);
 
                 //Check for ACCESS_FINE_LOCATION
                 if (perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.USE_SIP) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                     // All Permissions Granted
-                    initPhone();
+                    try {
+                        initPhone();
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
                 } else {
                     // Permission Denied
                     Toast.makeText(SplashActivity.this, "Some permissions were denied", Toast.LENGTH_SHORT).show();
                 }
+            }
             }
             break;
             default:
@@ -399,30 +408,6 @@ public class SplashActivity extends AppCompatActivity implements OnInitializeLis
         dlg.setCancelable(false);
         dlg.show(activity.getFragmentManager(), Constants.SharedPref.ASK_NUMBER_DLG);
 
-    }
-
-    private void requestRecordAudioPermission() {
-        //check API version, do nothing if API version < 23!
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion > android.os.Build.VERSION_CODES.LOLLIPOP) {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-
-                    // Show an expanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-
-                } else {
-
-                    // No explanation needed, we can request the permission.
-
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
-                }
-            }
-        }
     }
 
     private ArrayList<Contacts> getContactList() {
